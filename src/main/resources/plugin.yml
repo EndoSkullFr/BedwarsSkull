@@ -1,0 +1,8 @@
+name: BedwarsSkull
+version: 1.0
+authors: [BebedlaStreat, ZeFreestyle]
+description: Bedwars plugin for EndoSkull
+main: fr.endoskull.bedwars.Main
+commands:
+  bedwars:
+    aliases: [bw]
