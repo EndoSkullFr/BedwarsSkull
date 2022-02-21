@@ -72,5 +72,10 @@ public class StartListener implements Listener {
                 entity.teleport(new Location(e.getEntity().getWorld(), 1345.655, 24, -148));
             }
         }
+        if(e.getEntity().getType().equals(EntityType.PLAYER)) {
+            if(e.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
+                e.setCancelled(true);
+            }
+        }
     }
 }
