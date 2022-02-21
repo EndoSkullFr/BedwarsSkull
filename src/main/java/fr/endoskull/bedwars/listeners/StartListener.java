@@ -21,6 +21,9 @@ public class StartListener implements Listener {
             ActionBar actionBar = new ActionBar(ChatColor.GREEN + "En attente de joueurs" + "  " + getAllPlayers + "/12");
             actionBar.sendToAll();
         }
+        if(Main.getInstance().getServer().getOnlinePlayers().size() > 10) {
+
+        }
     }
 
     @EventHandler
