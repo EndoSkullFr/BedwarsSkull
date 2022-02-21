@@ -35,7 +35,7 @@ public class StartListener implements Listener {
         ItemStack team = new ItemStack(Material.WOOL, 1);
         ItemMeta teamM = team.getItemMeta();
         teamM.setDisplayName("§fChoisir une équipe");
-        teamM.setLore(Arrays.asList("", "§cFaites un clic droit pour quitter le mode de jeux !"));
+        teamM.setLore(Arrays.asList("", "§fFaites un clic droit pour choisir votre équipe"));
         team.setItemMeta(teamM);
         p.getInventory().setItem(4, team);
         p.updateInventory();
