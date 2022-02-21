@@ -26,5 +26,10 @@ public class StartListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
         e.setQuitMessage("§a[" + "§c+" + "§a]" + " " + e.getPlayer().getName());
+        if(Main.getInstance().getServer().getOnlinePlayers().size() < 10) {
+            int getAllPlayers = Main.getInstance().getServer().getOnlinePlayers().size();
+            ActionBar actionBar = new ActionBar(ChatColor.GREEN + "En attente de joueurs" + "  " + getAllPlayers + "/12");
+            actionBar.sendToAll();
+        }
     }
 }
