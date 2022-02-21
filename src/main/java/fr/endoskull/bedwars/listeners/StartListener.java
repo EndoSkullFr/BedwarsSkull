@@ -2,22 +2,39 @@ package fr.endoskull.bedwars.listeners;
 
 import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.utils.ActionBar;
-import net.md_5.bungee.api.ChatMessageType;
-import net.minecraft.server.v1_8_R3.ChatMessage;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class StartListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
+        Player p = e.getPlayer();
+        ItemStack quitI = new ItemStack(Material.BED, 1);
+        ItemMeta quitM = quitI.getItemMeta();
+        quitM.setDisplayName("§cQuitter");
+        quitM.setLore(Arrays.asList("", "§cFaites un clic droit pour quitter le mode de jeux !"));
+        quitI.setItemMeta(quitM);
+        p.getInventory().clear();
+        p.getInventory().setItem(9, quitI);
+        p.updateInventory();
+
+
         e.setJoinMessage("§a[" + "§2+" + "§a]" + " " + e.getPlayer().getName());
         e.getPlayer().setGameMode(GameMode.ADVENTURE);
         if(Main.getInstance().getServer().getOnlinePlayers().size() < 10) {
