@@ -18,7 +18,7 @@ public class StartListener implements Listener {
         e.setJoinMessage("§a[" + "§2+" + "§a]" + " " + e.getPlayer().getName());
         if(Main.getInstance().getServer().getOnlinePlayers().size() < 10) {
             int getAllPlayers = Main.getInstance().getServer().getOnlinePlayers().size();
-            ActionBar actionBar = new ActionBar(ChatColor.GREEN + "En attende de joueur..." + "    " + getAllPlayers + "/12");
+            ActionBar actionBar = new ActionBar(ChatColor.GREEN + "En attente de joueurs" + "  " + getAllPlayers + "/12");
             actionBar.sendToAll();
         }
     }
