@@ -44,6 +44,7 @@ public class StartListener implements Listener {
     public void onDeadOnVoid(EntityDamageEvent e) {
         if(e.getEntity().getType().equals(EntityType.PLAYER)) {
             if(e.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
+                e.setCancelled(true);
                 Entity entity = e.getEntity();
                 entity.teleport(new Location(e.getEntity().getWorld(), 1345.655, 24, -148));
             }
