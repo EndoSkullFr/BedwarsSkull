@@ -12,8 +12,8 @@ public class Main extends JavaPlugin {
         instance = this;
         getServer().getPluginManager().registerEvents(new StartListener(), this);
         super.onEnable();
-        Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "gamerule doDaylightCycle false");
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "time set 0");
+        Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "gamerule doDaylightCycle false");
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "gamerule doWeatherCycle false");
     }
 
