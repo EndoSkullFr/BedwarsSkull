@@ -41,7 +41,7 @@ public class StartListener implements Listener {
         p.updateInventory();
 
 
-        e.setJoinMessage("§a[" + "§2+" + "§a]" + " " + e.getPlayer().getName());
+        e.setJoinMessage("§a" + e.getPlayer().getDisplayName() + " a rejoint la partie ! " + Main.getInstance().getServer().getOnlinePlayers().size() + "/12");
         e.getPlayer().setGameMode(GameMode.ADVENTURE);
         if(Main.getInstance().getServer().getOnlinePlayers().size() < 10) {
             int getAllPlayers = Main.getInstance().getServer().getOnlinePlayers().size();
@@ -55,7 +55,7 @@ public class StartListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
-        e.setQuitMessage("§a[" + "§c+" + "§a]" + " " + e.getPlayer().getName());
+        e.setQuitMessage("§c" + e.getPlayer().getDisplayName() + " a quitté la partie ! " + Main.getInstance().getServer().getOnlinePlayers().size() + "/12");
         if(Main.getInstance().getServer().getOnlinePlayers().size() < 10) {
             int getAllPlayers = Main.getInstance().getServer().getOnlinePlayers().size();
             ActionBar actionBar = new ActionBar(ChatColor.GREEN + "En attente de joueurs" + "  " + getAllPlayers + "/12");
