@@ -1,0 +1,31 @@
+name: Treenan
+world: Bedwars1
+borderSize: 300
+lobby: 0.5:118:0.5:0:0
+corner1: 15:110:15
+corner2: -15:130:-15
+spawnProtection: 8
+baseRadius: 30
+heightLimit: 82
+maxTeamSize: 1
+teams:
+  red:
+    name: Rouge
+    color: 16711680
+    chatColor: "c"
+spawns:
+  red: 0.5:66:82.5:180:0
+beds:
+  red: 0:67:66
+generators:
+  red: 0.5:66:82.5:180:0
+shops:
+  red: -5.5:66:80:-90:0
+upgrades:
+  red: 6.5:66:80:90:0
+emeraldGenerators:
+  - -6.5:71:-10.5
+  - 8.5:71:12.5
+diamondGenerators:
+  - -28.5:67:31.5
+  - 31.5:67:29.5

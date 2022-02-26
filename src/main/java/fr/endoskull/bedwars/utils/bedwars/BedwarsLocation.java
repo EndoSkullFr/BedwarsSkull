@@ -23,6 +23,16 @@ public class BedwarsLocation {
         this.yaw = yaw;
         this.pitch = pitch;
     }
+    public BedwarsLocation(String[] s) {
+        this.x = Double.parseDouble(s[0]);
+        this.y = Double.parseDouble(s[1]);
+        this.z = Double.parseDouble(s[2]);
+        if (s.length > 3) {
+            this.yaw = Float.parseFloat(s[3]);
+            this.pitch = Float.parseFloat(s[4]);
+        }
+    }
+
 
     public double getX() {
         return x;

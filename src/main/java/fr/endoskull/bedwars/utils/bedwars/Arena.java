@@ -3,7 +3,9 @@ package fr.endoskull.bedwars.utils.bedwars;
 import fr.endoskull.bedwars.utils.GameEvent;
 import fr.endoskull.bedwars.utils.GameState;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,21 +17,28 @@ public class Arena {
     private BedwarsLocation lobby;
     private BedwarsLocation corner1;
     private BedwarsLocation corner2;
-    private GameState gameState;
-    private int startTimer;
-    private GameEvent gameEvent;
+    private GameState gameState = GameState.waiting;
+    private int startTimer = 60;
+    private GameEvent gameEvent = GameEvent.diamond2;
     private int eventTimer;
+    private int spawnProtection;
+    private int baseRadius;
+    private int heightLimit;
+    private int maxTeamSize;
 
-    private List<Team> teams;
-    private HashMap<Team, BedwarsLocation> spawns;
-    private HashMap<Team, BedwarsLocation> beds;
-    private HashMap<Team, BedwarsLocation> generators;
-    private HashMap<Team, BedwarsLocation> shops;
-    private HashMap<Team, BedwarsLocation> upgrades;
-    private List<BedwarsLocation> emeraldGenerators;
-    private List<BedwarsLocation> diamondGenerators;
+    private List<Team> teams = new ArrayList<>();
+    private HashMap<Team, BedwarsLocation> spawns = new HashMap<>();
+    private HashMap<Team, BedwarsLocation> beds = new HashMap<>();
+    private HashMap<Team, BedwarsLocation> generators = new HashMap<>();
+    private HashMap<Team, BedwarsLocation> shops = new HashMap<>();
+    private HashMap<Team, BedwarsLocation> upgrades = new HashMap<>();
+    private List<BedwarsLocation> emeraldGenerators = new ArrayList<>();
+    private List<BedwarsLocation> diamondGenerators = new ArrayList<>();
+    private HashMap<Player, Team> players = new HashMap<>();
 
-    public Arena(String name, World world, int borderSize, BedwarsLocation lobby, BedwarsLocation corner1, BedwarsLocation corner2, GameState gameState, int startTimer, GameEvent gameEvent, int eventTimer, List<Team> teams, HashMap<Team, BedwarsLocation> spawns, HashMap<Team, BedwarsLocation> beds, HashMap<Team, BedwarsLocation> generators, HashMap<Team, BedwarsLocation> shops, HashMap<Team, BedwarsLocation> upgrades, List<BedwarsLocation> emeraldGenerators, List<BedwarsLocation> diamondGenerators) {
+    public Arena() {}
+
+    /*public Arena(String name, World world, int borderSize, BedwarsLocation lobby, BedwarsLocation corner1, BedwarsLocation corner2, GameState gameState, int startTimer, GameEvent gameEvent, int eventTimer, int spawnProtection, int baseRadius, int heightLimit, List<Team> teams, HashMap<Team, BedwarsLocation> spawns, HashMap<Team, BedwarsLocation> beds, HashMap<Team, BedwarsLocation> generators, HashMap<Team, BedwarsLocation> shops, HashMap<Team, BedwarsLocation> upgrades, List<BedwarsLocation> emeraldGenerators, List<BedwarsLocation> diamondGenerators) {
         this.name = name;
         this.world = world;
         this.borderSize = borderSize;
@@ -40,6 +49,9 @@ public class Arena {
         this.startTimer = startTimer;
         this.gameEvent = gameEvent;
         this.eventTimer = eventTimer;
+        this.spawnProtection = spawnProtection;
+        this.baseRadius = baseRadius;
+        this.heightLimit = heightLimit;
         this.teams = teams;
         this.spawns = spawns;
         this.beds = beds;
@@ -48,7 +60,7 @@ public class Arena {
         this.upgrades = upgrades;
         this.emeraldGenerators = emeraldGenerators;
         this.diamondGenerators = diamondGenerators;
-    }
+    }*/
 
     public String getName() {
         return name;
@@ -192,5 +204,52 @@ public class Arena {
 
     public void setDiamondGenerators(List<BedwarsLocation> diamondGenerators) {
         this.diamondGenerators = diamondGenerators;
+    }
+
+    public int getSpawnProtection() {
+        return spawnProtection;
+    }
+
+    public void setSpawnProtection(int spawnProtection) {
+        this.spawnProtection = spawnProtection;
+    }
+
+    public int getBaseRadius() {
+        return baseRadius;
+    }
+
+    public void setBaseRadius(int baseRadius) {
+        this.baseRadius = baseRadius;
+    }
+
+    public Team getTeamByName(String name) {
+        for (Team team : teams) {
+            if (team.getName().equalsIgnoreCase(name)) return team;
+        }
+        return null;
+    }
+
+    public int getHeightLimit() {
+        return heightLimit;
+    }
+
+    public void setHeightLimit(int heightLimit) {
+        this.heightLimit = heightLimit;
+    }
+
+    public int getMaxTeamSize() {
+        return maxTeamSize;
+    }
+
+    public void setMaxTeamSize(int maxTeamSize) {
+        this.maxTeamSize = maxTeamSize;
+    }
+
+    public HashMap<Player, Team> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(HashMap<Player, Team> players) {
+        this.players = players;
     }
 }
