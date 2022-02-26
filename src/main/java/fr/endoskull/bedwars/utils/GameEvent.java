@@ -15,4 +15,12 @@ public enum GameEvent {
 
     private int duration;
     private String next;
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public String getNext() {
+        return next;
+    }
 }

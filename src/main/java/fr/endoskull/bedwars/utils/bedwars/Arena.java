@@ -1,13 +1,16 @@
 package fr.endoskull.bedwars.utils.bedwars;
 
+import fr.endoskull.bedwars.Main;
+import fr.endoskull.bedwars.utils.Cuboid;
 import fr.endoskull.bedwars.utils.GameEvent;
 import fr.endoskull.bedwars.utils.GameState;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.material.Colorable;
+import org.bukkit.material.Wool;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Arena {
 
@@ -18,13 +21,14 @@ public class Arena {
     private BedwarsLocation corner1;
     private BedwarsLocation corner2;
     private GameState gameState = GameState.waiting;
-    private int startTimer = 60;
+    private int startTimer = 10;
     private GameEvent gameEvent = GameEvent.diamond2;
-    private int eventTimer;
+    private int eventTimer = 0;
     private int spawnProtection;
     private int baseRadius;
     private int heightLimit;
     private int maxTeamSize;
+    private int min;
 
     private List<Team> teams = new ArrayList<>();
     private HashMap<Team, BedwarsLocation> spawns = new HashMap<>();
@@ -251,5 +255,63 @@ public class Arena {
 
     public void setPlayers(HashMap<Player, Team> players) {
         this.players = players;
+    }
+
+    public int getMin() {
+        return min;
+    }
+
+    public void setMin(int min) {
+        this.min = min;
+    }
+
+    public void addPlayer(Player player) {
+        player.teleport(lobby.getLocation(world));
+        players.put(player, null);
+        if (gameState == GameState.waiting && players.size() >= min) {
+            gameState = GameState.starting;
+        }
+    }
+
+    public List<Player> getPlayersPerTeam(Team team) {
+        List<Player> result = new ArrayList<>();
+        for (Player player : players.keySet()) {
+            if (players.get(player) != null) {
+                if (players.get(player).equals(team)) result.add(player);
+            }
+        }
+        return result;
+    }
+
+    public void start() {
+        gameState = GameState.playing;
+        eventTimer = gameEvent.getDuration();
+        List<Player> pls = new ArrayList<>(this.players.keySet());
+        Collections.shuffle(pls);
+        int i = 0;
+        for (Team team : teams) {
+            if (getPlayersPerTeam(team).size() >= maxTeamSize) continue;
+            if (this.players.get(pls.get(i)) == null) {
+                this.players.put(pls.get(i), team);
+            }
+        }
+        for (Team team : teams) {
+            if (!getPlayersPerTeam(team).isEmpty()) team.setAvaible(true);
+        }
+        for (Player player : players.keySet()) {
+            player.teleport(spawns.get(players.get(player)).getLocation(world));
+        }
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
+            for (Team team : teams) {
+                for (Block block : new Cuboid(new Location(world, spawns.get(team).getX() + baseRadius, 0, spawns.get(team).getZ() + baseRadius), new Location(world, spawns.get(team).getX() - baseRadius, 255, spawns.get(team).getZ() - baseRadius))) {
+                    if (block.getType() == Material.WOOL || block.getType() == Material.STAINED_GLASS_PANE || block.getType() == Material.STAINED_GLASS || block.getType() == Material.STAINED_CLAY || block.getType() == Material.CARPET) {
+                        block.setData(DyeColor.getByColor(team.getColor()).getWoolData());
+                    }
+                    if (block.getType() == Material.BANNER) {
+                        block.setData(DyeColor.getByColor(team.getColor()).getDyeData());
+                    }
+                }
+            }
+        });
     }
 }

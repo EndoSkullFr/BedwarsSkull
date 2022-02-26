@@ -32,6 +32,7 @@ public class MapManager {
         arena.setBaseRadius(config.getInt("baseRadius"));
         arena.setHeightLimit(config.getInt("heightLimit"));
         arena.setMaxTeamSize(config.getInt("maxTeamSize"));
+        arena.setMin(config.getInt("min"));
         for (String s : config.getConfigurationSection("teams").getKeys(false)) {
             Team team = new Team(s, config.getString("teams." + s + ".name"), Color.fromRGB(config.getInt("teams." + s + ".color")), ChatColor.getByChar(config.getString("teams." + s + ".chatColor")));
             arena.getTeams().add(team);

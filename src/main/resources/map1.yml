@@ -8,10 +8,11 @@ spawnProtection: 8
 baseRadius: 30
 heightLimit: 82
 maxTeamSize: 1
+min: 1
 teams:
   red:
     name: Rouge
-    color: 16711680
+    color: 10040115
     chatColor: "c"
 spawns:
   red: 0.5:66:82.5:180:0

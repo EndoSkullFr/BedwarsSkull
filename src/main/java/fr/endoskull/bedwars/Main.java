@@ -1,11 +1,16 @@
 package fr.endoskull.bedwars;
 
+import fr.endoskull.bedwars.board.FastBoard;
 import fr.endoskull.bedwars.listeners.JoinListener;
+import fr.endoskull.bedwars.tasks.BoardRunnable;
+import fr.endoskull.bedwars.tasks.StartRunnable;
 import fr.endoskull.bedwars.utils.MapManager;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
 import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +18,7 @@ import java.util.List;
 public class Main extends JavaPlugin {
     private static Main instance;
     private List<Arena> games = new ArrayList<>();
+    private List<FastBoard> boards = new ArrayList<>();
 
     @Override
     public void onEnable() {
@@ -26,6 +32,20 @@ public class Main extends JavaPlugin {
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "gamerule doWeatherCycle false");*/
         MapManager.createRessource("map1");
         MapManager.loadArena("map1");
+        saveResource("languages/French.yml", false);
+
+        for (Arena game : games) {
+            game.getWorld().setDifficulty(Difficulty.PEACEFUL);
+            game.getWorld().setGameRuleValue("doDaylightCycle", "false");
+            game.getWorld().setGameRuleValue("doWeatherCycle", "false");
+            game.getWorld().setGameRuleValue("doMobSpawning", "false");
+            game.getWorld().setGameRuleValue("doMobLoot", "false");
+            game.getWorld().setGameRuleValue("mobGriefing", "false");
+        }
+
+        BukkitScheduler scheduler = Bukkit.getScheduler();
+        scheduler.runTaskTimer(this, new BoardRunnable(this), 20, 5);
+        scheduler.runTaskTimer(this, new StartRunnable(this), 20, 20);
     }
 
     public static Main getInstance() {
@@ -34,5 +54,9 @@ public class Main extends JavaPlugin {
 
     public List<Arena> getGames() {
         return games;
+    }
+
+    public List<FastBoard> getBoards() {
+        return boards;
     }
 }
