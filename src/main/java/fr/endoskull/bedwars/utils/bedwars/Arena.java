@@ -296,7 +296,7 @@ public class Arena {
             }
         }
         for (Team team : teams) {
-            if (!getPlayersPerTeam(team).isEmpty()) team.setAvaible(true);
+            if (!getPlayersPerTeam(team).isEmpty()) team.setAvailable(true);
         }
         for (Player player : players.keySet()) {
             player.teleport(spawns.get(players.get(player)).getLocation(world));

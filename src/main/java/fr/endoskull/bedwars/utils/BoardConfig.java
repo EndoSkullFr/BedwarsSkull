@@ -46,13 +46,14 @@ public class BoardConfig {
                 int index = lines.indexOf(line);
                 lines.remove(index);
                 for (Team team : game.getTeams()) {
-                    if (!team.isAvaible()) continue;
+                    if (!team.isAvailable()) continue;
                     String status;
                     if (team.isHasBed()) {
                         status = "§a✔";
                     } else {
                         status = (game.getPlayersPerTeam(team).size() > 0 ? "§a" + game.getPlayersPerTeam(team) : "§c✖");
                     }
+                    if (game.getPlayers().containsKey(player) && game.getPlayers().get(player).equals(team)) status += MessagesUtils.YOU.getMessage(player);
                     lines.add(index, team.getChatColor() + team.getDisplayName().substring(0, 1) + "§f " + team.getDisplayName() + "§f: " + status);
                     index++;
                 }

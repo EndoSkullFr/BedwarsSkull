@@ -14,7 +14,7 @@ public class Team {
     private Color color;
     private ChatColor chatColor;
     private boolean hasBed = true;
-    private boolean avaible = false;
+    private boolean available = false;
 
     public Team(String name, String displayName, Color color, ChatColor chatColor) {
         this.name = name;
@@ -63,11 +63,11 @@ public class Team {
         this.displayName = displayName;
     }
 
-    public boolean isAvaible() {
-        return avaible;
+    public boolean isAvailable() {
+        return available;
     }
 
-    public void setAvaible(boolean avaible) {
-        this.avaible = avaible;
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 }
