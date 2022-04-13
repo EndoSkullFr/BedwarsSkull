@@ -1,12 +1,17 @@
 package fr.endoskull.bedwars.utils.bedwars;
 
+import fr.endoskull.api.spigot.utils.Hologram;
 import fr.endoskull.bedwars.Main;
-import fr.endoskull.bedwars.utils.Cuboid;
-import fr.endoskull.bedwars.utils.GameEvent;
-import fr.endoskull.bedwars.utils.GameState;
+import fr.endoskull.bedwars.utils.*;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
 import org.bukkit.material.Wool;
 
@@ -21,7 +26,7 @@ public class Arena {
     private BedwarsLocation corner1;
     private BedwarsLocation corner2;
     private GameState gameState = GameState.waiting;
-    private int startTimer = 10;
+    private int startTimer = 5;
     private GameEvent gameEvent = GameEvent.diamond2;
     private int eventTimer = 0;
     private int spawnProtection;
@@ -29,16 +34,30 @@ public class Arena {
     private int heightLimit;
     private int maxTeamSize;
     private int min;
+    private int timer = 0;
 
     private List<Team> teams = new ArrayList<>();
     private HashMap<Team, BedwarsLocation> spawns = new HashMap<>();
     private HashMap<Team, BedwarsLocation> beds = new HashMap<>();
     private HashMap<Team, BedwarsLocation> generators = new HashMap<>();
+    private HashMap<Team, ArmorStand> asGenerators = new HashMap<>();
+    private HashMap<BedwarsLocation, ArmorStand> asDiamonds = new HashMap<>();
+    private HashMap<BedwarsLocation, Hologram> diamondsHologram = new HashMap<>();
+    private HashMap<BedwarsLocation, ArmorStand> asEmeralds = new HashMap<>();
+    private HashMap<BedwarsLocation, Hologram> emeraldsHologram = new HashMap<>();
     private HashMap<Team, BedwarsLocation> shops = new HashMap<>();
     private HashMap<Team, BedwarsLocation> upgrades = new HashMap<>();
     private List<BedwarsLocation> emeraldGenerators = new ArrayList<>();
     private List<BedwarsLocation> diamondGenerators = new ArrayList<>();
     private HashMap<Player, Team> players = new HashMap<>();
+    private HashMap<Player, TierTool> itemsTier = new HashMap<>();
+
+    private int diamondTimer;
+    private int emeraldTimer;
+    private int diamondTier;
+    private int emeraldTier;
+    private List<Block> placedBlocks = new ArrayList<>();
+    private HashMap<Player, List<ShopItems>> alreadyBought = new HashMap<>();
 
     public Arena() {}
 
@@ -286,20 +305,55 @@ public class Arena {
     public void start() {
         gameState = GameState.playing;
         eventTimer = gameEvent.getDuration();
+        diamondTier = 1;
+        diamondTimer = ConfigUtils.getTieredGeneratorTimer(ShopItems.ShopMaterial.diamond, diamondTier);
+        emeraldTier = 1;
+        emeraldTimer = ConfigUtils.getTieredGeneratorTimer(ShopItems.ShopMaterial.emerald, emeraldTier);
+        for (BedwarsLocation diamondGenerator : diamondGenerators) {
+            ArmorStand as = world.spawn(diamondGenerator.getLocation(world).clone().add(0, 2, 0), ArmorStand.class);
+            as.setVisible(false);
+            as.setGravity(false);
+            as.setHelmet(new ItemStack(Material.DIAMOND_BLOCK));
+            asDiamonds.put(diamondGenerator, as);
+            Hologram hologram = new Hologram(diamondGenerator.getLocation(world).clone().add(0, 6, 0), "");
+            hologram.spawn();
+            diamondsHologram.put(diamondGenerator, hologram);
+        }
+        for (BedwarsLocation emeraldGenerator : emeraldGenerators) {
+            ArmorStand as = world.spawn(emeraldGenerator.getLocation(world).clone().add(0, 2, 0), ArmorStand.class);
+            as.setVisible(false);
+            as.setGravity(false);
+            as.setHelmet(new ItemStack(Material.EMERALD_BLOCK));
+            asEmeralds.put(emeraldGenerator, as);
+            Hologram hologram = new Hologram(emeraldGenerator.getLocation(world).clone().add(0, 6, 0), "");
+            hologram.spawn();
+            emeraldsHologram.put(emeraldGenerator, hologram);
+        }
         List<Player> pls = new ArrayList<>(this.players.keySet());
         Collections.shuffle(pls);
         int i = 0;
         for (Team team : teams) {
             if (getPlayersPerTeam(team).size() >= maxTeamSize) continue;
-            if (this.players.get(pls.get(i)) == null) {
-                this.players.put(pls.get(i), team);
-            }
+            players.putIfAbsent(pls.get(i), team);
         }
         for (Team team : teams) {
             if (!getPlayersPerTeam(team).isEmpty()) team.setAvailable(true);
+            Villager villager = world.spawn(shops.get(team).getLocation(world), Villager.class);
+            villager.setCustomName("§aSHOP");
+            villager.setCustomNameVisible(true);
+            villager.setProfession(Villager.Profession.FARMER);
+            setNoAI(villager);
+            setSilent(villager);
+            ArmorStand as = world.spawn(generators.get(team).getLocation(world), ArmorStand.class);
+            as.setVisible(false);
+            as.setGravity(false);
+            as.setMarker(true);
+            asGenerators.put(team, as);
         }
         for (Player player : players.keySet()) {
             player.teleport(spawns.get(players.get(player)).getLocation(world));
+            itemsTier.put(player, new TierTool(player));
+            alreadyBought.put(player, new ArrayList<>());
         }
         Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
             for (Team team : teams) {
@@ -313,5 +367,116 @@ public class Arena {
                 }
             }
         });
+        for (Block block : new Cuboid(corner1.getLocation(world), corner2.getLocation(world))) {
+            if (block.getType() != Material.AIR) block.setType(Material.AIR);
+        }
+    }
+
+    public void nextEvent() {
+        if (gameEvent.getNext().equalsIgnoreCase("none")) {
+            /**
+             * todo end the game
+             */
+            return;
+        }
+        gameEvent = GameEvent.valueOf(gameEvent.getNext());
+        eventTimer = gameEvent.getDuration();
+        /**
+         * todo broadcast event
+         */
+    }
+
+    private void setNoAI(Entity bukkitEntity) {
+        net.minecraft.server.v1_8_R3.Entity nmsEntity = ((CraftEntity) bukkitEntity).getHandle();
+        NBTTagCompound tag = nmsEntity.getNBTTag();
+        if (tag == null) {
+            tag = new NBTTagCompound();
+        }
+        nmsEntity.c(tag);
+        tag.setInt("NoAI", 1);
+        nmsEntity.f(tag);
+    }
+
+    private void setSilent(Entity bukkitEntity) {
+        net.minecraft.server.v1_8_R3.Entity nmsEntity = ((CraftEntity) bukkitEntity).getHandle();
+        NBTTagCompound tag = nmsEntity.getNBTTag();
+        if (tag == null) {
+            tag = new NBTTagCompound();
+        }
+        nmsEntity.c(tag);
+        tag.setInt("Silent", 1);
+        nmsEntity.f(tag);
+    }
+
+    public int getTimer() {
+        return timer;
+    }
+
+    public void setTimer(int timer) {
+        this.timer = timer;
+    }
+
+    public HashMap<Team, ArmorStand> getAsGenerators() {
+        return asGenerators;
+    }
+
+    public HashMap<Player, TierTool> getItemsTier() {
+        return itemsTier;
+    }
+
+    public int getDiamondTimer() {
+        return diamondTimer;
+    }
+
+    public void setDiamondTimer(int diamondTimer) {
+        this.diamondTimer = diamondTimer;
+    }
+
+    public int getEmeraldTimer() {
+        return emeraldTimer;
+    }
+
+    public void setEmeraldTimer(int emeraldTimer) {
+        this.emeraldTimer = emeraldTimer;
+    }
+
+    public int getDiamondTier() {
+        return diamondTier;
+    }
+
+    public void setDiamondTier(int diamondTier) {
+        this.diamondTier = diamondTier;
+    }
+
+    public int getEmeraldTier() {
+        return emeraldTier;
+    }
+
+    public void setEmeraldTier(int emeraldTier) {
+        this.emeraldTier = emeraldTier;
+    }
+
+    public HashMap<BedwarsLocation, ArmorStand> getAsDiamonds() {
+        return asDiamonds;
+    }
+
+    public HashMap<BedwarsLocation, ArmorStand> getAsEmeralds() {
+        return asEmeralds;
+    }
+
+    public HashMap<BedwarsLocation, Hologram> getDiamondsHologram() {
+        return diamondsHologram;
+    }
+
+    public HashMap<BedwarsLocation, Hologram> getEmeraldsHologram() {
+        return emeraldsHologram;
+    }
+
+    public List<Block> getPlacedBlocks() {
+        return placedBlocks;
+    }
+
+    public HashMap<Player, List<ShopItems>> getAlreadyBought() {
+        return alreadyBought;
     }
 }

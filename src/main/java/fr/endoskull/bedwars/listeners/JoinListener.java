@@ -2,6 +2,7 @@ package fr.endoskull.bedwars.listeners;
 
 import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.board.FastBoard;
+import fr.endoskull.bedwars.utils.FavoritesUtils;
 import fr.endoskull.bedwars.utils.MapManager;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
 import org.bukkit.entity.Player;
@@ -22,6 +23,7 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
+        FavoritesUtils.initFavorites(player);
         Arena game = MapManager.findAvaibleGame(1);
         FastBoard board = new FastBoard(player);
         main.getBoards().add(board);

@@ -11,7 +11,10 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -93,6 +96,13 @@ public class CustomItemStack extends ItemStack {
         LeatherArmorMeta lch = (LeatherArmorMeta) this.getItemMeta();
         lch.setColor(color);
         this.setItemMeta(lch);
+        return this;
+    }
+
+    public CustomItemStack addPotionEffect(PotionEffectType effectType, int amplifier, int duration) {
+        PotionMeta meta = (PotionMeta) this.getItemMeta();
+        meta.addCustomEffect(new PotionEffect(effectType,duration * 20, amplifier), true);
+        this.setItemMeta(meta);
         return this;
     }
 

@@ -1,12 +1,12 @@
 package fr.endoskull.bedwars.utils;
 
 public enum GameEvent {
-    diamond2(300, "emerald2"),
-    emerald2(300, "diamond3"),
-    diamond3(300, "emerald3"),
-    emerald3(300, "bedDestroy"),
-    bedDestroy(600, "gameOver"),
-    gameOver(600, "none");
+    diamond2(10, "emerald2"),
+    emerald2(10, "diamond3"),
+    diamond3(10, "emerald3"),
+    emerald3(10, "bedDestroy"),
+    bedDestroy(10, "gameOver"),
+    gameOver(10, "none");
 
     GameEvent(int duration, String next) {
         this.duration = duration;

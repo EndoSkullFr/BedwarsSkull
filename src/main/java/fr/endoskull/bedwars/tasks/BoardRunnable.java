@@ -4,6 +4,7 @@ import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.board.FastBoard;
 import fr.endoskull.bedwars.utils.BoardConfig;
 import fr.endoskull.bedwars.utils.GameState;
+import fr.endoskull.bedwars.utils.MessagesUtils;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -62,7 +63,7 @@ public class BoardRunnable extends BukkitRunnable {
                                     .replace("{on}", String.valueOf(game.getPlayers().size()))
                                     .replace("{max}", String.valueOf(game.getTeams().size() * game.getMaxTeamSize()))
                                     .replace("{time}", getText(game.getEventTimer()))
-                                    .replace("{nextEvent}", game.getGameEvent().name()));
+                                    .replace("{nextEvent}", MessagesUtils.getEventDisplayname(player, game.getGameEvent())));
                         }
                         board.updateTitle(BoardConfig.getPlayingTitle());
                         board.updateLines(lines);

@@ -1,0 +1,33 @@
+generators:
+  iron:
+    delay: 2
+    amount: 20
+    spawn-limit: 40
+  gold:
+    delay: 5
+    amount: 10
+    spawn-limit: 7
+  diamond:
+    tierI:
+      delay: 30
+      spawn-limit: 4
+    tierII:
+      delay: 20
+      spawn-limit: 6
+      start: 360
+    tierIII:
+      delay: 15
+      spawn-limit: 8
+      start: 1080
+  emerald:
+    tierI:
+      delay: 70
+      spawn-limit: 4
+    tierII:
+      delay: 50
+      spawn-limit: 6
+      start: 720
+    tierIII:
+      delay: 30
+      spawn-limit: 8
+      start: 1440

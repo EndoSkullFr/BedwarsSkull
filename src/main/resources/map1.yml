@@ -1,6 +1,6 @@
-name: Treenan
-world: Bedwars1
-borderSize: 300
+name: Ashore
+world: world
+borderSize: 220
 lobby: 0.5:118:0.5:0:0
 corner1: 15:110:15
 corner2: -15:130:-15
@@ -15,18 +15,18 @@ teams:
     color: 10040115
     chatColor: "c"
 spawns:
-  red: 0.5:66:82.5:180:0
+  red: 80.5:63:1.5:90:0
 beds:
-  red: 0:67:66
+  red: 67:64:1
 generators:
-  red: 0.5:66:82.5:180:0
+  red: 82.5:63:1.5:90:0
 shops:
-  red: -5.5:66:80:-90:0
+  red: 80:63:7.5:180:0
 upgrades:
-  red: 6.5:66:80:90:0
+  red: 80:63:-4.5:0:0
 emeraldGenerators:
-  - -6.5:71:-10.5
-  - 8.5:71:12.5
+  - 0.5:65:1.5
+  - 0.5:84:1.5
 diamondGenerators:
-  - -28.5:67:31.5
-  - 31.5:67:29.5
+  - 44.5:64:-45.5
+  - 47.5:64:45.5

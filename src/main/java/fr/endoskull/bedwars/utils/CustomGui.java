@@ -2,6 +2,7 @@ package fr.endoskull.bedwars.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -15,6 +16,7 @@ public abstract class CustomGui {
     private UUID uuid;
     private Inventory yourInventory;
     private Map<Integer, CustomGuiAction> actions;
+    private Map<Integer, CustomGuiSuperAction> superActions;
     private int line;
 
     public CustomGui(int line, String invName) {
@@ -22,6 +24,7 @@ public abstract class CustomGui {
         yourInventory = Bukkit.createInventory(null, line * 9, invName);
         this.line = line;
         actions = new HashMap<>();
+        superActions = new HashMap<>();
         inventoriesByUUID.put(getUuid(), this);
     }
 
@@ -37,6 +40,10 @@ public abstract class CustomGui {
         void click(Player player);
     }
 
+    public interface CustomGuiSuperAction {
+        void click(Player player, ClickType clickType);
+    }
+
     public void setItem(int slot, ItemStack stack, CustomGuiAction action){
         yourInventory.setItem(slot, stack);
         if (action != null){
@@ -44,8 +51,15 @@ public abstract class CustomGui {
         }
     }
 
+    public void setItem(int slot, ItemStack stack, CustomGuiSuperAction action){
+        yourInventory.setItem(slot, stack);
+        if (action != null){
+            superActions.put(slot, action);
+        }
+    }
+
     public void setItem(int slot, ItemStack stack){
-        setItem(slot, stack, null);
+        yourInventory.setItem(slot, stack);
     }
 
     public void open(Player p){
@@ -63,6 +77,10 @@ public abstract class CustomGui {
 
     public Map<Integer, CustomGuiAction> getActions() {
         return actions;
+    }
+
+    public Map<Integer, CustomGuiSuperAction> getSuperActions() {
+        return superActions;
     }
 
     public void delete(){

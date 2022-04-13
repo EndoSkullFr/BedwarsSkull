@@ -1,9 +1,12 @@
 package fr.endoskull.bedwars;
 
 import fr.endoskull.bedwars.board.FastBoard;
+import fr.endoskull.bedwars.listeners.CustomGuiListener;
+import fr.endoskull.bedwars.listeners.GameListener;
 import fr.endoskull.bedwars.listeners.JoinListener;
+import fr.endoskull.bedwars.tasks.ArmorStandTask;
 import fr.endoskull.bedwars.tasks.BoardRunnable;
-import fr.endoskull.bedwars.tasks.StartRunnable;
+import fr.endoskull.bedwars.tasks.GameRunnable;
 import fr.endoskull.bedwars.utils.MapManager;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
 import org.bukkit.Bukkit;
@@ -22,10 +25,13 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         instance = this;
         PluginManager pm = Bukkit.getPluginManager();
         //pm.registerEvents(new StartListener(), this);
         pm.registerEvents(new JoinListener(this), this);
+        pm.registerEvents(new GameListener(this), this);
+        pm.registerEvents(new CustomGuiListener(), this);
         super.onEnable();
         /*Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "time set 0");
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "gamerule doDaylightCycle false");
@@ -45,7 +51,8 @@ public class Main extends JavaPlugin {
 
         BukkitScheduler scheduler = Bukkit.getScheduler();
         scheduler.runTaskTimer(this, new BoardRunnable(this), 20, 5);
-        scheduler.runTaskTimer(this, new StartRunnable(this), 20, 20);
+        scheduler.runTaskTimer(this, new GameRunnable(this), 20, 20);
+        scheduler.runTaskTimer(this, new ArmorStandTask(this), 20, 1);
     }
 
     public static Main getInstance() {

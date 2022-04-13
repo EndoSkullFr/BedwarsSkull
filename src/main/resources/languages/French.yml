@@ -1,5 +1,142 @@
 you: " §7TOI"
+bought-item: "§c§lBEDWARS §8» §aVous avez acheté §6%item% x%amount%"
+cant-afford: "§cVous n'avez pas assez de ressources pour acheter ceci"
+shift-click: "§cShift-clique sur un item pour l'ajouter aux favoris"
+break-self-bed: "§cVous ne pouvez pas casser votre propre lit"
+break-block: "§cVous ne pouvez casser que les blocs qui ont été placé par des joueurs"
 
+default-item-lore: "§7Prix: %price%\n\n§7%desc%\n\n§aCliquez pour acheter\n§bShift-clique pour ajouter aux favoris"
+less-item-lore: "§7Prix: %price%\n\n§7%desc%\n\n§cRessources insuffisantes\n§bShift-clique pour ajouter aux favoris"
+max-item-lore: "\n§aAmélioration maximum atteinte\n§bShift-clique pour ajouter aux favoris"
+item-already-lore: "\n§cVous posséder déjà cet item\n§bShift-clique pour ajouter aux favoris"
+item-already-best-lore: "\n§cVous posséder un item de niveau supérieur\n§bShift-clique pour ajouter aux favoris"
+
+favorite-item-lore: "§7Prix: %price%\n\n§7%desc%\n\n§aCliquez pour acheter\n§bShift-clique pour retirer des favoris"
+less-favorite-lore: "§7Prix: %price%\n\n§7%desc%\n\n§cRessources insuffisantes\n§bShift-clique pour retirer des favoris"
+favorite-max-lore: "\n§aAmélioration maximum atteinte\n§bShift-clique pour retirer des favoris"
+favorite-already: "\n§cVous posséder déjà cet item\n§bShift-clique pour retirer des favoris"
+favorite-already-best: "\n§cVous posséder un item de niveau supérieur\n§bShift-clique pour retirer des favoris"
+
+favorite-replace: "\n§aCliquez pour remplacer"
+add-favorite: "§aCliquez pour mettre ici"
+
+iron: "§fFer"
+irons: "§fFers"
+gold: "§eOr"
+golds: "§eOrs"
+diamond: "§bDiamant"
+diamonds: "§bDiamants"
+emerald: "§aÉmeraude"
+emeralds: "§aÉmeraudes"
+
+categories:
+  QUICK_BUY: "Favoris"
+  BLOCKS: "Blocs"
+  MELEE: "Mêlées"
+  ARMOR: "Armures"
+  TOOLS: "Outils"
+  RANGED: "Arcs"
+  POTIONS: "Potions"
+  UTILITY: "Utilitaires"
+items:
+  WOOL:
+    name: "Laine"
+    desc: "Bloc le plus basique, pratique pour faire des ponts mais peu efficace pour protéger son lit"
+  SANDSTONE:
+    name: "Argile"
+    desc: "Un bloc un peu resistant qui nécessitera l'achat d'une pioche le casser"
+  GLASS:
+    name: "Verre"
+    desc: "Resistant aux explosions"
+  ENDSTONE:
+    name: "Endstone"
+    desc: "Bloc plutôt solide qui résiste bien aux explosions"
+  LADDER:
+    name: "Échelle"
+    desc: "Permet de tenir les tnt à une plus grande distance de votre lit et permet aussi de faire des clutchs ;)"
+  WOOD:
+    name: "Bois"
+    desc: "Bloc qui nécessitera l'achat d'une hache pour le casser, cependant ce bloc de résiste pas aux explosions de Fireball"
+  OBSIDIAN:
+    name: "Obsidienne"
+    desc: "Le bloc le plus solide (et le plus cher), il résiste aux explosions de tnt et est même assez long à casser avec une pioche en diamant"
+  SHEARS:
+    name: "Cisailles"
+    desc: "Permet de casser la laine plus rapidement"
+  AXE1:
+    name: "Hache en bois"
+    desc: "Une hache toute simple"
+  AXE2:
+    name: "Hache en pierre"
+    desc: "Une hache plutôt efficace"
+  AXE3:
+    name: "Hache en fer"
+    desc: "Une hache digne d'un bon bûcheron"
+  AXE4:
+    name: "Hache en diamant"
+    desc: "Une hache superbement efficace"
+  PICKAXE1:
+    name: "Pioche en bois"
+    desc: "Une pioche toute simple"
+  PICKAXE2:
+    name: "Pioche en pierre"
+    desc: "Une pioche plutôt efficace"
+  PICKAXE3:
+    name: "Pioche en or"
+    desc: "Une pioche digne d'un mineur"
+  PICKAXE4:
+    name: "Pioche en diamant"
+    desc: "Une pioche très efficace"
+  STICK:
+    name: "Baton (Knockback II)"
+    desc: "Le baton de l'enfer"
+  SWORD1:
+    name: "Épée en pierre"
+    desc: "Une épée low cost"
+  SWORD2:
+    name: "Épée en fer"
+    desc: "Une épée bien aiguisé"
+  SWORD3:
+    name: "Épée en diamant"
+    desc: "Une épée digne d'un vrai guerrier"
+  ARMOR1:
+    name: "Armure en maille"
+    desc: "Une armure basique"
+  ARMOR2:
+    name: "Armure en fer"
+    desc: "Une armure plutôt resistante"
+  ARMOR3:
+    name: "Armure en diamant"
+    desc: "Une armure parfaite pour les tanks"
+  ARROW:
+    name: "Flèches"
+    desc: "Un vrai guerrier n'a pas besoin de cet item ;)"
+  BOW1:
+    name: "Arc"
+    desc: "Un arc tout simple"
+  BOW2:
+    name: "Arc (Power I)"
+    desc: "Un arc qui met des bons dégâts"
+  BOW3:
+    name: "Arc (Power I, Punch I)"
+    desc: "Un arc qui aura tendance a énervé vos adversaires"
+  POTION_SPEED:
+    name: "Potion de speed II (45s)"
+    desc: "Devenez aussi rapide qu'un ninja"
+  POTION_JUMP:
+    name: "Potion de jump V (45s)"
+    desc: "Sautez par dessus les murs et ponts de votre adversaire"
+  POTION_INVI:
+    name: "Potion d'invisibilité (30s)"
+    desc: "Disparaissez du point de vue de votre adversaire... Mais attention à ne pas vous faire repérer par les empreintes au sol"
+
+events:
+  diamond2: "Diamants II"
+  emerald2: "Émeraudes II"
+  diamond3: "Diamants III"
+  emerald3: "Émeraudes III"
+  bedDestroy: "Fin des lits"
+  gameOver: "Fin"
 board:
   waiting:
     - '§a§lBED WARS'

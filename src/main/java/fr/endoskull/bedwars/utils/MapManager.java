@@ -43,6 +43,9 @@ public class MapManager {
         for (String s : config.getConfigurationSection("generators").getKeys(false)) {
             arena.getGenerators().put(arena.getTeamByName(s), new BedwarsLocation(config.getString("generators." + s).split(":")));
         }
+        for (String s : config.getConfigurationSection("shops").getKeys(false)) {
+            arena.getShops().put(arena.getTeamByName(s), new BedwarsLocation(config.getString("shops." + s).split(":")));
+        }
         for (String s : config.getConfigurationSection("upgrades").getKeys(false)) {
             arena.getUpgrades().put(arena.getTeamByName(s), new BedwarsLocation(config.getString("upgrades." + s).split(":")));
         }
@@ -52,6 +55,10 @@ public class MapManager {
         for (String s : config.getStringList("diamondGenerators")) {
             arena.getDiamondGenerators().add(new BedwarsLocation(s.split(":")));
         }
+        for (String s : config.getConfigurationSection("beds").getKeys(false)) {
+            arena.getBeds().put(arena.getTeamByName(s), new BedwarsLocation(config.getString("beds." + s).split(":")));
+        }
+
         Main.getInstance().getGames().add(arena);
     }
 
