@@ -176,7 +176,7 @@ public class ShopGuiOld extends CustomGui {
                     }
                 }
             } else {
-                if (value.isOneTimeBought() && game.getAlreadyBought().get(player).contains(value)) {
+                if (value.isPermanent() && game.getAlreadyBought().get(player).contains(value)) {
                     return new CustomItemStack(value.getItem(player))
                             .setName("§c"+ MessagesUtils.getItemName(player, value))
                             .setLore((favorite ? MessagesUtils.FAVORITE_ALREADY : MessagesUtils.ITEM_ALREADY_LORE).getMessage(player));

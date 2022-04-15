@@ -12,44 +12,81 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public enum ShopItems {
-    WOOL(new ItemStack(Material.WOOL, 16), ShopCategories.BLOCKS, Material.IRON_INGOT, 4, true),
-    SANDSTONE(new ItemStack(Material.STAINED_CLAY, 16), ShopCategories.BLOCKS, Material.IRON_INGOT, 12, true),
-    GLASS(new ItemStack(Material.STAINED_GLASS, 4), ShopCategories.BLOCKS, Material.IRON_INGOT, 12, true),
-    ENDSTONE(new ItemStack(Material.ENDER_STONE, 12), ShopCategories.BLOCKS, Material.IRON_INGOT, 24),
-    LADDER(new ItemStack(Material.LADDER, 8), ShopCategories.BLOCKS, Material.IRON_INGOT, 4),
-    WOOD(new ItemStack(Material.WOOD, 16), ShopCategories.BLOCKS, Material.GOLD_INGOT, 4),
-    OBSIDIAN(new ItemStack(Material.OBSIDIAN, 4), ShopCategories.BLOCKS, Material.EMERALD, 4),
+    WOOL(new ItemStack(Material.WOOL, 16), ShopCategories.BLOCKS, Material.IRON_INGOT, 4, true, false, "", 1, false, false, false),
+    SANDSTONE(new ItemStack(Material.STAINED_CLAY, 16), ShopCategories.BLOCKS, Material.IRON_INGOT, 12, true, false, "", 1, false, false, false),
+    GLASS(new ItemStack(Material.STAINED_GLASS, 4), ShopCategories.BLOCKS, Material.IRON_INGOT, 12, true, false, "", 1, false, false, false),
+    ENDSTONE(new ItemStack(Material.ENDER_STONE, 12), ShopCategories.BLOCKS, Material.IRON_INGOT, 24, false, false, "", 1, false, false, false),
+    LADDER(new ItemStack(Material.LADDER, 8), ShopCategories.BLOCKS, Material.IRON_INGOT, 4, false, false, "", 1, false, false, false),
+    WOOD(new ItemStack(Material.WOOD, 16), ShopCategories.BLOCKS, Material.GOLD_INGOT, 4, false, false, "", 1, false, false, false),
+    OBSIDIAN(new ItemStack(Material.OBSIDIAN, 4), ShopCategories.BLOCKS, Material.EMERALD, 4, false, false, "", 1, false, false, false),
 
-    STICK(new CustomItemStack(Material.STICK).addCustomEnchantment(Enchantment.KNOCKBACK, 1), ShopCategories.MELEE, Material.GOLD_INGOT, 5),
-    SWORD1(new ItemStack(Material.STONE_SWORD), ShopCategories.MELEE, Material.IRON_INGOT, 10),
-    SWORD2(new ItemStack(Material.IRON_SWORD), ShopCategories.MELEE, Material.GOLD_INGOT, 7),
-    SWORD3(new ItemStack(Material.DIAMOND_SWORD), ShopCategories.MELEE, Material.EMERALD, 4),
+    SWORD1(new ItemStack(Material.STONE_SWORD), ShopCategories.MELEE, Material.IRON_INGOT, 10, false, false, "", 1, false, false, true),
+    SWORD2(new ItemStack(Material.IRON_SWORD), ShopCategories.MELEE, Material.GOLD_INGOT, 7, false, false, "", 1, false, false, true),
+    SWORD3(new ItemStack(Material.DIAMOND_SWORD), ShopCategories.MELEE, Material.EMERALD, 4, false, false, "", 1, false, false, true),
+    STICK(new CustomItemStack(Material.STICK).addCustomEnchantment(Enchantment.KNOCKBACK, 1), ShopCategories.MELEE, Material.GOLD_INGOT, 5, false, false, "", 1, false, false, false),
 
-    ARMOR1(new ItemStack(Material.CHAINMAIL_BOOTS), ShopCategories.ARMOR, Material.IRON_INGOT, 40, "armor", 1, false, true, true),
-    ARMOR2(new ItemStack(Material.IRON_BOOTS), ShopCategories.ARMOR, Material.GOLD_INGOT, 12, "armor", 2, false, true, true),
-    ARMOR3(new ItemStack(Material.DIAMOND_BOOTS), ShopCategories.ARMOR, Material.EMERALD, 6, "armor", 3, false, true, true),
+    ARMOR1(new ItemStack(Material.CHAINMAIL_BOOTS), ShopCategories.ARMOR, Material.IRON_INGOT, 40, false, true, "armor", 1, false, true, true),
+    ARMOR2(new ItemStack(Material.IRON_BOOTS), ShopCategories.ARMOR, Material.GOLD_INGOT, 12, false, true, "armor", 2, false, true, true),
+    ARMOR3(new ItemStack(Material.DIAMOND_BOOTS), ShopCategories.ARMOR, Material.EMERALD, 6, false, true, "armor", 3, false, true, true),
 
-    ARROW(new ItemStack(Material.ARROW, 6), ShopCategories.RANGED, Material.GOLD_INGOT, 4),
-    BOW1(new ItemStack(Material.BOW), ShopCategories.RANGED, Material.GOLD_INGOT, 12),
-    BOW2(new CustomItemStack(Material.BOW).addCustomEnchantment(Enchantment.ARROW_DAMAGE, 1), ShopCategories.RANGED, Material.GOLD_INGOT, 24),
-    BOW3(new CustomItemStack(Material.BOW).addCustomEnchantment(Enchantment.ARROW_DAMAGE, 1).addCustomEnchantment(Enchantment.ARROW_KNOCKBACK, 1), ShopCategories.RANGED, Material.EMERALD, 6),
+    SHEARS(new ItemStack(Material.SHEARS), ShopCategories.TOOLS, Material.IRON_INGOT, 20, false, true, "", 1, false, false, true),
+    AXE1(new ItemStack(Material.WOOD_AXE), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, true, "axe", 1, true, false, true),
+    AXE2(new ItemStack(Material.STONE_AXE), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, false, "axe", 2, true, false, true),
+    AXE3(new ItemStack(Material.IRON_AXE), ShopCategories.TOOLS, Material.GOLD_INGOT, 3, false, false, "axe", 3, true, false, true),
+    AXE4(new ItemStack(Material.DIAMOND_AXE), ShopCategories.TOOLS, Material.GOLD_INGOT, 6, false, false, "axe", 4, true, false, true),
+    PICKAXE1(new ItemStack(Material.WOOD_PICKAXE), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, true, "pickaxe", 1, true, false, true),
+    PICKAXE2(new ItemStack(Material.IRON_PICKAXE), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, false, "pickaxe", 2, true, false, true),
+    PICKAXE3(new ItemStack(Material.GOLD_PICKAXE), ShopCategories.TOOLS, Material.GOLD_INGOT, 3, false, false, "pickaxe", 3, true, false, true),
+    PICKAXE4(new ItemStack(Material.DIAMOND_PICKAXE), ShopCategories.TOOLS, Material.GOLD_INGOT, 6, false, false, "pickaxe", 4, true, false, true),
 
-    POTION_SPEED(new CustomItemStack(Material.POTION, 1, (byte) 8194).addPotionEffect(PotionEffectType.SPEED, 1, 45), ShopCategories.POTIONS, Material.EMERALD, 1),
-    POTION_JUMP(new CustomItemStack(Material.POTION, 1, (byte) 8203).addPotionEffect(PotionEffectType.JUMP, 4, 45), ShopCategories.POTIONS, Material.EMERALD, 1),
-    POTION_INVI(new CustomItemStack(Material.POTION, 1, (byte) 8238).addPotionEffect(PotionEffectType.INVISIBILITY, 0, 30), ShopCategories.POTIONS, Material.EMERALD, 2),
+    ARROW(new ItemStack(Material.ARROW, 6), ShopCategories.RANGED, Material.GOLD_INGOT, 4, false, false, "", 1, false, false, false),
+    BOW1(new ItemStack(Material.BOW), ShopCategories.RANGED, Material.GOLD_INGOT, 12, false, false, "", 1, false, false, true),
+    BOW2(new CustomItemStack(Material.BOW).addCustomEnchantment(Enchantment.ARROW_DAMAGE, 1), ShopCategories.RANGED, Material.GOLD_INGOT, 24, false, false, "", 1, false, false, true),
+    BOW3(new CustomItemStack(Material.BOW).addCustomEnchantment(Enchantment.ARROW_DAMAGE, 1).addCustomEnchantment(Enchantment.ARROW_KNOCKBACK, 1), ShopCategories.RANGED, Material.EMERALD, 6, false, false, "", 1, false, false, true),
 
-    SHEARS(new ItemStack(Material.SHEARS), ShopCategories.TOOLS, Material.IRON_INGOT, 20, false, true),
-    AXE1(new ItemStack(Material.WOOD_AXE), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, true, "axe", 1),
-    AXE2(new ItemStack(Material.STONE_AXE), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, false, "axe", 2),
-    AXE3(new ItemStack(Material.IRON_AXE), ShopCategories.TOOLS, Material.GOLD_INGOT, 3, false, false, "axe", 3),
-    AXE4(new ItemStack(Material.DIAMOND_AXE), ShopCategories.TOOLS, Material.GOLD_INGOT, 6, false, false, "axe", 4),
-    PICKAXE1(new ItemStack(Material.WOOD_PICKAXE), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, true, "pickaxe", 1),
-    PICKAXE2(new ItemStack(Material.IRON_PICKAXE), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, false, "pickaxe", 2),
-    PICKAXE3(new ItemStack(Material.GOLD_PICKAXE), ShopCategories.TOOLS, Material.GOLD_INGOT, 3, false, false, "pickaxe", 3),
-    PICKAXE4(new ItemStack(Material.DIAMOND_PICKAXE), ShopCategories.TOOLS, Material.GOLD_INGOT, 6, false, false, "pickaxe", 4),;
+    POTION_SPEED(new CustomItemStack(Material.POTION, 1, (byte) 8194).addPotionEffect(PotionEffectType.SPEED, 1, 45), ShopCategories.POTIONS, Material.EMERALD, 1, false, false, "", 1, false, false, false),
+    POTION_JUMP(new CustomItemStack(Material.POTION, 1, (byte) 8203).addPotionEffect(PotionEffectType.JUMP, 4, 45), ShopCategories.POTIONS, Material.EMERALD, 1, false, false, "", 1, false, false, false),
+    POTION_INVI(new CustomItemStack(Material.POTION, 1, (byte) 8238).addPotionEffect(PotionEffectType.INVISIBILITY, 0, 30), ShopCategories.POTIONS, Material.EMERALD, 2, false, false, "", 1, false, false, false),
+
+    GOLDEN_APPLE(new CustomItemStack(Material.GOLDEN_APPLE), ShopCategories.UTILITY, Material.GOLD_INGOT, 3, false, false, "", 1, false, false, false),
+    BED_BUG(new CustomItemStack(Material.SNOW_BALL), ShopCategories.UTILITY, Material.IRON_INGOT, 30, false, false, "", 1, false, false, false),
+    GOLEM(new CustomItemStack(Material.MONSTER_EGG, 1, (byte) 99), ShopCategories.UTILITY, Material.IRON_INGOT, 120, false, false, "", 1, false, false, false),
+    FIREBALL(new CustomItemStack(Material.FIREBALL), ShopCategories.UTILITY, Material.IRON_INGOT, 40, false, false, "", 1, false, false, false),
+    TNT(new CustomItemStack(Material.TNT), ShopCategories.UTILITY, Material.GOLD_INGOT, 4, false, false, "", 1, false, false, false),
+    ENDER_PEARL(new CustomItemStack(Material.ENDER_PEARL), ShopCategories.UTILITY, Material.EMERALD, 4, false, false, "", 1, false, false, false),
+    WATER_BUCKET(new CustomItemStack(Material.WATER_BUCKET), ShopCategories.UTILITY, Material.GOLD_INGOT, 3, false, false, "", 1, false, false, false),
+    BRIDGE_EGG(new CustomItemStack(Material.EGG), ShopCategories.UTILITY, Material.EMERALD, 1, false, false, "", 1, false, false, false),
+    MILK(new CustomItemStack(Material.MILK_BUCKET), ShopCategories.UTILITY, Material.GOLD_INGOT, 4, false, false, "", 1, false, false, false),
+    SPONG(new CustomItemStack(Material.SPONGE, 4), ShopCategories.UTILITY, Material.GOLD_INGOT, 3, false, false, "", 1, false, false, false),
+    POPUP_TOWER(new CustomItemStack(Material.CHEST), ShopCategories.UTILITY, Material.IRON_INGOT, 24, false, false, "", 1, false, false, false),;
+
+
+    private static final HashMap<String, ShopItems> fromHypixel = new HashMap<String, ShopItems>() {{
+        put("wool", WOOL);
+        put("hardened_clay", SANDSTONE);
+        put("stick_(knockback_i)", STICK);
+        put("wooden_pickaxe", PICKAXE1);
+        put("compact_pop-up_tower", POPUP_TOWER);
+        put("tnt", TNT);
+        put("oak_wood_planks", WOOD);
+        put("iron_sword", SWORD2);
+        put("iron_boots", ARMOR2);
+        put("shears", SHEARS);
+        put("arrow", ARROW);
+        put("invisibility_potion_(30_seconds)", POTION_INVI);
+        put("water_bucket", WATER_BUCKET);
+        put("wooden_axe", AXE1);
+        put("ladder", LADDER);
+        put("end_stone", ENDSTONE);
+        put("fireball", FIREBALL);
+        put("golden_apple", GOLDEN_APPLE);
+        put("diamond_boots", ARMOR3);
+        put("ender_pearl", ENDER_PEARL);
+    }};
 
     public static int getMaxFamilyTier(String family) {
         int tier = 0;
@@ -90,9 +127,23 @@ public enum ShopItems {
     private int tier = 1;
     private boolean stackFamily = true;
     private boolean armor = false;
-    private boolean oneTimeBought = false;
+    private boolean unbreakable = false;
 
-    ShopItems(ItemStack item, ShopCategories category, Material cost, int amount) {
+    ShopItems(ItemStack item, ShopCategories category, Material cost, int amount, boolean colorable, boolean permanent, String family, int tier, boolean stackFamily, boolean armor, boolean unbreakable) {
+        this.item = item;
+        this.category = category;
+        this.cost = cost;
+        this.amount = amount;
+        this.colorable = colorable;
+        this.permanent = permanent;
+        this.family = family;
+        this.tier = tier;
+        this.stackFamily = stackFamily;
+        this.armor = armor;
+        this.unbreakable = unbreakable;
+    }
+
+    /*ShopItems(ItemStack item, ShopCategories category, Material cost, int amount) {
         this.item = item;
         this.category = category;
         this.cost = cost;
@@ -127,7 +178,7 @@ public enum ShopItems {
         this.tier = tier;
     }
 
-    ShopItems(ItemStack item, ShopCategories category, Material cost, int amount, String family, int tier, boolean stackFamily, boolean armor, boolean oneTimeBought) {
+    ShopItems(ItemStack item, ShopCategories category, Material cost, int amount, String family, int tier, boolean stackFamily, boolean armor, boolean permanent) {
         this.item = item;
         this.category = category;
         this.cost = cost;
@@ -136,19 +187,19 @@ public enum ShopItems {
         this.tier = tier;
         this.stackFamily = stackFamily;
         this.armor = armor;
-        this.oneTimeBought = oneTimeBought;
-    }
+        this.permanent = permanent;
+    }*/
 
     public ItemStack getItem(Player player) {
         ItemStack it = item.clone();
         if (colorable) {
             for (Arena game : Main.getInstance().getGames()) {
                 if (game.getPlayers().containsKey(player)) {
-                    it.setDurability(DyeColor.getByColor(game.getPlayers().get(player).getColor()).getWoolData());
+                    it.setDurability(game.getPlayers().get(player).getColor().dye().getWoolData());
                 }
             }
         }
-        return new CustomItemStack(it).setUnbreakable();
+        return new CustomItemStack(it).setUnbreakable(unbreakable);
     }
 
     public ShopCategories getCategory() {
@@ -181,8 +232,8 @@ public enum ShopItems {
 
     public void giveArmor(Player player) {
         if (armor) {
-            player.getInventory().setBoots(new ItemStack(Material.valueOf(getItem(player).getType().name().split("_")[0] + "_BOOTS")));
-            player.getInventory().setLeggings(new ItemStack(Material.valueOf(getItem(player).getType().name().split("_")[0] + "_LEGGINGS")));
+            player.getInventory().setBoots(new CustomItemStack(Material.valueOf(getItem(player).getType().name().split("_")[0] + "_BOOTS")).setUnbreakable(unbreakable));
+            player.getInventory().setLeggings(new CustomItemStack(Material.valueOf(getItem(player).getType().name().split("_")[0] + "_LEGGINGS")).setUnbreakable(unbreakable));
         }
     }
 
@@ -194,8 +245,8 @@ public enum ShopItems {
         return stackFamily;
     }
 
-    public boolean isOneTimeBought() {
-        return oneTimeBought;
+    public boolean isUnbreakable() {
+        return unbreakable;
     }
 
     public static enum ShopMaterial {
@@ -234,5 +285,9 @@ public enum ShopItems {
         public boolean isSpawningAtBase() {
             return spawningAtBase;
         }
+    }
+
+    public static HashMap<String, ShopItems> getFromHypixel() {
+        return fromHypixel;
     }
 }

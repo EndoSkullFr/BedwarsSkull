@@ -66,6 +66,14 @@ public class BoardRunnable extends BukkitRunnable {
                                     .replace("{nextEvent}", MessagesUtils.getEventDisplayname(player, game.getGameEvent())));
                         }
                         board.updateTitle(BoardConfig.getPlayingTitle());
+                        int i = 0;
+                        for (String line : new ArrayList<>(lines)) {
+                            if (line.length() > 30) {
+                                line = line.substring(0, 30);
+                            }
+                            lines.set(i, line);
+                            i++;
+                        }
                         board.updateLines(lines);
                     }
                 }

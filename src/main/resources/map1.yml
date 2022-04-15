@@ -12,18 +12,27 @@ min: 1
 teams:
   red:
     name: Rouge
-    color: 10040115
+    color: RED
     chatColor: "c"
+  blue:
+    name: Bleu
+    color: BLUE
+    chatColor: "9"
 spawns:
   red: 80.5:63:1.5:90:0
+  blue: 0.5:63:-78.5:0:0
 beds:
   red: 67:64:1
+  blue: 0:64:-66
 generators:
-  red: 82.5:63:1.5:90:0
+  red: 82.5:63:1.5
+  blue: 0.5:63:-80.5
 shops:
   red: 80:63:7.5:180:0
+  blue: 6.5:63:-78:90:0
 upgrades:
   red: 80:63:-4.5:0:0
+  blue: -5.5:63:-78:-90:0
 emeraldGenerators:
   - 0.5:65:1.5
   - 0.5:84:1.5

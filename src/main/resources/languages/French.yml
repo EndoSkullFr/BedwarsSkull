@@ -3,7 +3,10 @@ bought-item: "§c§lBEDWARS §8» §aVous avez acheté §6%item% x%amount%"
 cant-afford: "§cVous n'avez pas assez de ressources pour acheter ceci"
 shift-click: "§cShift-clique sur un item pour l'ajouter aux favoris"
 break-self-bed: "§cVous ne pouvez pas casser votre propre lit"
-break-block: "§cVous ne pouvez casser que les blocs qui ont été placé par des joueurs"
+break-block: "§cVous ne pouvez pas casser ce bloc"
+heigh-limit: "§cHauteur maximale de contruction atteinte"
+cant-place-here: "§cVous ne pouvez pas poser de blocs ici"
+cant-chest: "§cVous ne pouvez pas ouvrir ce coffre car son équipe est encore en vie"
 
 default-item-lore: "§7Prix: %price%\n\n§7%desc%\n\n§aCliquez pour acheter\n§bShift-clique pour ajouter aux favoris"
 less-item-lore: "§7Prix: %price%\n\n§7%desc%\n\n§cRessources insuffisantes\n§bShift-clique pour ajouter aux favoris"
@@ -19,6 +22,20 @@ favorite-already-best: "\n§cVous posséder un item de niveau supérieur\n§bShi
 
 favorite-replace: "\n§aCliquez pour remplacer"
 add-favorite: "§aCliquez pour mettre ici"
+
+hypixel-start: "§eDebut de l'importation des favoris..."
+hypixel-error: "§cUne erreur s'est produite"
+hypixel-success: "§aImportation réussi avec succès"
+hypixel-already: "§cVous avez déjà tenter de récupérer vos favoris au cours de cette partie. Dû aux limites de l'api d'hypixel nous ne pouvons pas retenter une connection pour vous au cours de cette partie"
+
+bed-break: "\n§f§lLIT DÉTRUIT > {TeamColor}Lit {TeamName} §7vient d'être cassé par {PlayerColor}{PlayerName} §7!\n§r §r"
+bed-break-victim: "§f§lLIT DÉTRUIT > §7Votre lit vient d'être cassé par {PlayerColor}{PlayerName} §7!"
+bed-break-title: "§cLIT DÉTRUIT !"
+bed-break-subtitle: "§fVous ne pourrez plus respawn"
+
+leave-bed: "§cQuitter"
+spectate-compass: "§eSe téléporter à un joueur"
+replay-paper: "§aRejouer"
 
 iron: "§fFer"
 irons: "§fFers"
@@ -38,6 +55,7 @@ categories:
   RANGED: "Arcs"
   POTIONS: "Potions"
   UTILITY: "Utilitaires"
+
 items:
   WOOL:
     name: "Laine"
@@ -88,7 +106,7 @@ items:
     name: "Pioche en diamant"
     desc: "Une pioche très efficace"
   STICK:
-    name: "Baton (Knockback II)"
+    name: "Baton (Knockback I)"
     desc: "Le baton de l'enfer"
   SWORD1:
     name: "Épée en pierre"
@@ -129,6 +147,39 @@ items:
   POTION_INVI:
     name: "Potion d'invisibilité (30s)"
     desc: "Disparaissez du point de vue de votre adversaire... Mais attention à ne pas vous faire repérer par les empreintes au sol"
+  GOLDEN_APPLE:
+    name: "Pomme dorée"
+    desc: "Donne un bon avantage en combat"
+  BED_BUG:
+    name: "Punaises de lits"
+    desc: "Généralement destestés par les adversaires"
+  GOLEM:
+    name: "Golem défensif"
+    desc: "Apporte un gros soutien lors d'un assaut ou d'une défense"
+  FIREBALL:
+    name: "Boule de feu"
+    desc: "Pratique pour casser un pont sous les pieds de votre adversaire ou se propulser en l'ai"
+  TNT:
+    name: "TNT"
+    desc: "Un item dévasteur qui ne fera qu'un bouchée de la protection de vos adversaires"
+  ENDER_PEARL:
+    name: "Ender pearl"
+    desc: "Utile pour fuir un combat, se rattraper lors d'une chute ou attaquer une base"
+  WATER_BUCKET:
+    name: "Seau d'eau"
+    desc: "Permet de rendre votre base plus difficile à attaquer"
+  BRIDGE_EGG:
+    name: "Oeuf de pont"
+    desc: "Pratique quand on a pas le temps de faire un pont"
+  MILK:
+    name: "Seau de lait"
+    desc: "Permet de ne pas activer les effets des pièges ennemis pendant 30 secondes"
+  SPONG:
+    name: "Éponge"
+    desc: "Permet de retirer de l'eau (ou de faire le ninja avec les particules)"
+  POPUP_TOWER:
+    name: "Popup tower"
+    desc: "Les amateurs de chateau ne vont pas être dessus"
 
 events:
   diamond2: "Diamants II"

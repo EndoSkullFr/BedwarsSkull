@@ -3,6 +3,8 @@ package fr.endoskull.bedwars.guis;
 import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.utils.*;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
+import org.apache.commons.io.IOUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Item;
@@ -10,6 +12,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
+import java.net.URL;
 
 public class ShopGui extends CustomGui {
     public static int[] itemsSlot = {19,20,21,22,23,24,25, 28,29,30,31,32,33,34, 37,38,39,40,41,42,43};
@@ -18,6 +26,7 @@ public class ShopGui extends CustomGui {
     public ShopGui(ShopCategories category, Player p) {
         super(6, MessagesUtils.getCategoryName(p, category));
         Arena game = GameUtils.getGame(p);
+        if (game == null) return;
         int i = 0;
         for (ShopCategories value : ShopCategories.values()) {
             setItem(i, new CustomItemStack(value.getItem()).setName("§a" + MessagesUtils.getCategoryName(p, value)), player -> {
@@ -26,7 +35,57 @@ public class ShopGui extends CustomGui {
             i++;
         }
         setItem(45, new CustomItemStack(Material.LEVER).setName("§a§lImporter les favoris depuis HYPIXEL"), player -> {
+            player.closeInventory();
+            if (game.getAlreadyHypixel().contains(player.getUniqueId())) {
+                player.sendMessage(MessagesUtils.HYPIXEL_ALREADY.getMessage(player));
+                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1f, 1f);
+                return;
+            }
+            player.sendMessage(MessagesUtils.HYPIXEL_START.getMessage(player));
+            Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
+                String url = "https://api.hypixel.net/player?uuid=" + player.getUniqueId() + "&key=1489f709-c502-4c0d-9e8c-345142681b97";
+                try {
+                    String json = IOUtils.toString(new URL(url));
+                    if(json.isEmpty()) {
+                        player.sendMessage(MessagesUtils.HYPIXEL_ERROR.getMessage(player));
+                        player.playSound(player.getLocation(), Sound.ANVIL_LAND, 1f, 1f);
+                        return;
+                    }
+                    JSONObject object = (JSONObject) JSONValue.parseWithException(json);
+                    if (!(boolean) object.get("success")) {
+                        player.sendMessage(MessagesUtils.HYPIXEL_ERROR.getMessage(player));
+                        player.playSound(player.getLocation(), Sound.ANVIL_LAND, 1f, 1f);
+                        game.getAlreadyHypixel().add(player.getUniqueId());
+                        return;
+                    }
+                    String pls = "player";
+                    JSONObject plsObject = (JSONObject) object.get(pls);
+                    String stats = "stats";
+                    JSONObject statsObject = (JSONObject) plsObject.get(stats);
+                    String bed = "Bedwars";
+                    JSONObject bedObject = (JSONObject) statsObject.get(bed);
+                    String fav = "favourites_2";
+                    String[] items = bedObject.get(fav).toString().split(",");
+                    int j = 0;
+                    FavoritesUtils.getFavorites(player).clear();
+                    for (String item : items) {
+                        ShopItems shopItems = ShopItems.getFromHypixel().get(item);
+                        if (shopItems != null) {
+                            FavoritesUtils.getFavorites(player).put(itemsSlot[j], shopItems);
+                        }
+                        j++;
+                    }
+                    player.sendMessage(MessagesUtils.HYPIXEL_SUCCESS.getMessage(player));
+                    player.playSound(player.getLocation(), Sound.LEVEL_UP, 1f, 1f);
+                    game.getAlreadyHypixel().add(player.getUniqueId());
+                    new ShopGui(category, player).open(player);
 
+                } catch (IOException | ParseException | NullPointerException e) {
+                    player.sendMessage(MessagesUtils.HYPIXEL_ERROR.getMessage(player));
+                    player.playSound(player.getLocation(), Sound.ANVIL_LAND, 1f, 1f);
+                    game.getAlreadyHypixel().add(player.getUniqueId());
+                }
+            });
         });
         i = 0;
 
@@ -34,7 +93,7 @@ public class ShopGui extends CustomGui {
             for (int slot : itemsSlot) {
                 if (FavoritesUtils.getFavorites(p).containsKey(slot)) {
                     ShopItems value = FavoritesUtils.getFavorites(p).get(slot);
-                    if (!value.getFamily().equalsIgnoreCase("")) {
+                    if (!value.getFamily().equalsIgnoreCase("") && value.isStackFamily()) {
                         if (game.getItemsTier().get(p).getUpgrades().containsKey(value.getFamily()) && ShopItems.getMaxFamilyTier(value.getFamily()) <= game.getItemsTier().get(p).getUpgrades().get(value.getFamily())) {
                             value = ShopItems.getFromFamily(p, value.getFamily(), ShopItems.getMaxFamilyTier(value.getFamily()));
                         } else if (game.getItemsTier().get(p).getUpgrades().containsKey(value.getFamily())) {
@@ -82,17 +141,25 @@ public class ShopGui extends CustomGui {
                         }
                     }
                 } else {
-                    if (value.isOneTimeBought() && game.getAlreadyBought().get(player).contains(value)) {
+                    if (value.isPermanent() && game.getAlreadyBought().get(player).contains(value)) {
                         buyAction = false;
                     } else if (game.getItemsTier().get(player).getUpgrades().containsKey(value.getFamily()) && game.getItemsTier().get(player).getUpgrades().get(value.getFamily()) > value.getTier()) {
                         buyAction = false;
                     }
                 }
             }
+            if (value.isPermanent() && game.getAlreadyBought().get(player).contains(value)) {
+                buyAction = false;
+            }
             if (!buyAction) return;
             if (hasMaterial(p, value.getCost(), value.getAmount())) {
                 clear(p, value.getCost(), value.getAmount());
-                if (value.isOneTimeBought()) game.getAlreadyBought().get(player).add(value);
+                if (value.isPermanent()) {
+                    game.getAlreadyBought().get(player).add(value);
+                }
+                if (value.getItem(player).getType().toString().contains("SWORD")) {
+                    player.getInventory().remove(Material.WOOD_SWORD);
+                }
                 if (value.getFamily().equalsIgnoreCase("")) {
                     if (value.isArmor()) {
                         value.giveArmor(player);
@@ -138,7 +205,7 @@ public class ShopGui extends CustomGui {
                     }
                 }
             } else {
-                if (value.isOneTimeBought() && game.getAlreadyBought().get(player).contains(value)) {
+                if (value.isPermanent() && game.getAlreadyBought().get(player).contains(value)) {
                     return new CustomItemStack(value.getItem(player))
                             .setName("§c"+ MessagesUtils.getItemName(player, value))
                             .setLore((favorite ? MessagesUtils.FAVORITE_ALREADY : MessagesUtils.ITEM_ALREADY_LORE).getMessage(player));
@@ -148,6 +215,11 @@ public class ShopGui extends CustomGui {
                             .setLore((favorite ? MessagesUtils.FAVORITE_ALREADY_BEST : MessagesUtils.ITEM_ALREADY_BEST_LORE).getMessage(player));
                 }
             }
+        }
+        if (value.isPermanent() && game.getAlreadyBought().get(player).contains(value)) {
+            return new CustomItemStack(value.getItem(player))
+                    .setName("§c" + MessagesUtils.getItemName(player, value))
+                    .setLore((favorite ? MessagesUtils.FAVORITE_ALREADY : MessagesUtils.ITEM_ALREADY_LORE).getMessage(player));
         }
         String material = MessagesUtils.getMaterial(player, ShopItems.ShopMaterial.getByType(value.getCost()), value.getAmount());
         return new CustomItemStack(value.getItem(player))

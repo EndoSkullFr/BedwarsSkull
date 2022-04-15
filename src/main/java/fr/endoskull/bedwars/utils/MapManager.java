@@ -4,6 +4,7 @@ import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
 import fr.endoskull.bedwars.utils.bedwars.BedwarsLocation;
 import fr.endoskull.bedwars.utils.bedwars.Team;
+import fr.endoskull.bedwars.utils.bedwars.TeamColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -11,8 +12,11 @@ import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.util.HashMap;
 
 public class MapManager {
+
+    private static HashMap<Integer, Integer> colorMap = new HashMap<>();
 
     public static void createRessource(String name) {
         Main.getInstance().saveResource(name + ".yml", false);
@@ -34,7 +38,7 @@ public class MapManager {
         arena.setMaxTeamSize(config.getInt("maxTeamSize"));
         arena.setMin(config.getInt("min"));
         for (String s : config.getConfigurationSection("teams").getKeys(false)) {
-            Team team = new Team(s, config.getString("teams." + s + ".name"), Color.fromRGB(config.getInt("teams." + s + ".color")), ChatColor.getByChar(config.getString("teams." + s + ".chatColor")));
+            Team team = new Team(s, config.getString("teams." + s + ".name"), TeamColor.valueOf(config.getString("teams." + s + ".color")));
             arena.getTeams().add(team);
         }
         for (String s : config.getConfigurationSection("spawns").getKeys(false)) {

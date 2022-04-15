@@ -4,20 +4,18 @@ import fr.endoskull.api.spigot.utils.Hologram;
 import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.utils.ConfigUtils;
 import fr.endoskull.bedwars.utils.GameState;
+import fr.endoskull.bedwars.utils.NmsUtils;
 import fr.endoskull.bedwars.utils.ShopItems;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
 import fr.endoskull.bedwars.utils.bedwars.BedwarsLocation;
-import net.minecraft.server.v1_8_R3.PacketPlayOutEntityEquipment;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
-import org.bukkit.entity.ArmorStand;
+import fr.endoskull.bedwars.utils.mobs.Despawnable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class GameRunnable extends BukkitRunnable {
     private Main main;
@@ -51,7 +49,8 @@ public class GameRunnable extends BukkitRunnable {
                                 }
                             }
                             if (amount < maxAmount) {
-                                game.getWorld().dropItemNaturally(bedwarsLocation.getLocation(game.getWorld()), new ItemStack(value.getType(), ConfigUtils.getGeneratorAmount(value)));
+                                Item item = game.getWorld().dropItem(bedwarsLocation.getLocation(game.getWorld()), new ItemStack(value.getType(), ConfigUtils.getGeneratorAmount(value)));
+                                item.setVelocity(new Vector(0, 0, 0));
                             }
                         });
                     }
@@ -77,7 +76,8 @@ public class GameRunnable extends BukkitRunnable {
                             }
                         }
                         if (amount < maxAmount) {
-                            game.getWorld().dropItemNaturally(diamondGenerator.getLocation(game.getWorld()), new ItemStack(ShopItems.ShopMaterial.diamond.getType(), 1));
+                            Item item =game.getWorld().dropItem(diamondGenerator.getLocation(game.getWorld()), new ItemStack(ShopItems.ShopMaterial.diamond.getType(), 1));
+                            item.setVelocity(new Vector(0, 0, 0));
                         }
                     }
                 }
@@ -95,7 +95,8 @@ public class GameRunnable extends BukkitRunnable {
                             }
                         }
                         if (amount < maxAmount) {
-                            game.getWorld().dropItemNaturally(emeraldGenerator.getLocation(game.getWorld()), new ItemStack(ShopItems.ShopMaterial.emerald.getType(), 1));
+                            Item item = game.getWorld().dropItem(emeraldGenerator.getLocation(game.getWorld()), new ItemStack(ShopItems.ShopMaterial.emerald.getType(), 1));
+                            item.setVelocity(new Vector(0, 0, 0));
                         }
                     }
                 }
@@ -110,31 +111,22 @@ public class GameRunnable extends BukkitRunnable {
 
                 for (Player player : game.getPlayers().keySet()) {
                     if (player.getActivePotionEffects().stream().filter(potionEffect -> potionEffect.getType().equals(PotionEffectType.INVISIBILITY)).findFirst().orElse(null) != null) {
-                        PacketPlayOutEntityEquipment helmetPacket = new PacketPlayOutEntityEquipment(player.getEntityId(), 1, null);
-                        PacketPlayOutEntityEquipment chestPacket = new PacketPlayOutEntityEquipment(player.getEntityId(), 2, null);
-                        PacketPlayOutEntityEquipment legPacket = new PacketPlayOutEntityEquipment(player.getEntityId(), 3, null);
-                        PacketPlayOutEntityEquipment bootsPacket = new PacketPlayOutEntityEquipment(player.getEntityId(), 4, null);
                         for (Player receiver : game.getPlayers().keySet()) {
                             if (game.getPlayersPerTeam(game.getPlayers().get(player)).contains(receiver)) continue;
-                            ((CraftPlayer)receiver).getHandle().playerConnection.sendPacket(helmetPacket);
-                            ((CraftPlayer)receiver).getHandle().playerConnection.sendPacket(chestPacket);
-                            ((CraftPlayer)receiver).getHandle().playerConnection.sendPacket(legPacket);
-                            ((CraftPlayer)receiver).getHandle().playerConnection.sendPacket(bootsPacket);
+                            NmsUtils.hideArmor(player, receiver);
                         }
                     } else {
-                        PacketPlayOutEntityEquipment helmetPacket = new PacketPlayOutEntityEquipment(player.getEntityId(), 1, CraftItemStack.asNMSCopy(player.getInventory().getHelmet()));
-                        PacketPlayOutEntityEquipment chestPacket = new PacketPlayOutEntityEquipment(player.getEntityId(), 2, CraftItemStack.asNMSCopy(player.getInventory().getChestplate()));
-                        PacketPlayOutEntityEquipment legPacket = new PacketPlayOutEntityEquipment(player.getEntityId(), 3, CraftItemStack.asNMSCopy(player.getInventory().getLeggings()));
-                        PacketPlayOutEntityEquipment bootsPacket = new PacketPlayOutEntityEquipment(player.getEntityId(), 4, CraftItemStack.asNMSCopy(player.getInventory().getBoots()));
                         for (Player receiver : game.getPlayers().keySet()) {
-                            ((CraftPlayer)receiver).getHandle().playerConnection.sendPacket(helmetPacket);
-                            ((CraftPlayer)receiver).getHandle().playerConnection.sendPacket(chestPacket);
-                            ((CraftPlayer)receiver).getHandle().playerConnection.sendPacket(legPacket);
-                            ((CraftPlayer)receiver).getHandle().playerConnection.sendPacket(bootsPacket);
+                            if (game.getPlayersPerTeam(game.getPlayers().get(player)).contains(receiver)) continue;
+                            NmsUtils.showArmor(player, receiver);
                         }
                     }
                 }
             }
+        }
+
+        for (Despawnable d : Despawnable.getDespawnableMap().values()){
+            d.refresh();
         }
     }
 }

@@ -29,6 +29,10 @@ public class JoinListener implements Listener {
         main.getBoards().add(board);
         if (game != null) {
             game.addPlayer(player);
+        } else {
+            /**
+             * todo no game avaible ???
+             */
         }
     }
 

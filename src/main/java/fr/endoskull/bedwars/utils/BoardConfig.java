@@ -51,10 +51,10 @@ public class BoardConfig {
                     if (team.isHasBed()) {
                         status = "§a✔";
                     } else {
-                        status = (game.getPlayersPerTeam(team).size() > 0 ? "§a" + game.getPlayersPerTeam(team) : "§c✖");
+                        status = (game.getPlayersPerTeam(team).size() > 0 ? "§a" + game.getPlayersPerTeam(team).size() : "§c✖");
                     }
                     if (game.getPlayers().containsKey(player) && game.getPlayers().get(player).equals(team)) status += MessagesUtils.YOU.getMessage(player);
-                    lines.add(index, team.getChatColor() + team.getDisplayName().substring(0, 1) + "§f " + team.getDisplayName() + "§f: " + status);
+                    lines.add(index, team.getColor().chat() + team.getDisplayName().substring(0, 1) + "§f " + team.getDisplayName() + "§f: " + status);
                     index++;
                 }
             }

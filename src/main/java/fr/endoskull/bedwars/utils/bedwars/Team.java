@@ -11,16 +11,14 @@ public class Team {
 
     private String name;
     private String displayName;
-    private Color color;
-    private ChatColor chatColor;
+    private TeamColor color;
     private boolean hasBed = true;
     private boolean available = false;
 
-    public Team(String name, String displayName, Color color, ChatColor chatColor) {
+    public Team(String name, String displayName, TeamColor color) {
         this.name = name;
         this.displayName = displayName;
         this.color = color;
-        this.chatColor = chatColor;
     }
 
     public String getName() {
@@ -31,20 +29,12 @@ public class Team {
         this.name = name;
     }
 
-    public Color getColor() {
+    public TeamColor getColor() {
         return color;
     }
 
-    public void setColor(Color color) {
+    public void setColor(TeamColor color) {
         this.color = color;
-    }
-
-    public ChatColor getChatColor() {
-        return chatColor;
-    }
-
-    public void setChatColor(ChatColor chatColor) {
-        this.chatColor = chatColor;
     }
 
     public boolean isHasBed() {

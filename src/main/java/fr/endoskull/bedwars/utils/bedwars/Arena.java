@@ -2,6 +2,7 @@ package fr.endoskull.bedwars.utils.bedwars;
 
 import fr.endoskull.api.spigot.utils.Hologram;
 import fr.endoskull.bedwars.Main;
+import fr.endoskull.bedwars.tasks.RespawnTask;
 import fr.endoskull.bedwars.utils.*;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.*;
@@ -58,6 +59,9 @@ public class Arena {
     private int emeraldTier;
     private List<Block> placedBlocks = new ArrayList<>();
     private HashMap<Player, List<ShopItems>> alreadyBought = new HashMap<>();
+    private final List<UUID> alreadyHypixel = new ArrayList<>();
+    private final HashMap<Player, RespawnTask> respawnings = new HashMap<>();
+    private final List<Player> spectators = new ArrayList<>();
 
     public Arena() {}
 
@@ -286,6 +290,7 @@ public class Arena {
 
     public void addPlayer(Player player) {
         player.teleport(lobby.getLocation(world));
+        InventoryUtils.setWaitingInv(player);
         players.put(player, null);
         if (gameState == GameState.waiting && players.size() >= min) {
             gameState = GameState.starting;
@@ -334,35 +339,43 @@ public class Arena {
         int i = 0;
         for (Team team : teams) {
             if (getPlayersPerTeam(team).size() >= maxTeamSize) continue;
+            if (players.size() <= i) break;
             players.putIfAbsent(pls.get(i), team);
+            i++;
         }
         for (Team team : teams) {
             if (!getPlayersPerTeam(team).isEmpty()) team.setAvailable(true);
-            Villager villager = world.spawn(shops.get(team).getLocation(world), Villager.class);
+            /**Villager villager = world.spawn(shops.get(team).getLocation(world), Villager.class);
             villager.setCustomName("§aSHOP");
             villager.setCustomNameVisible(true);
             villager.setProfession(Villager.Profession.FARMER);
             setNoAI(villager);
-            setSilent(villager);
+            setSilent(villager);*/
+            NmsUtils.spawnVillager(shops.get(team).getLocation(world), "§aSHOP");
             ArmorStand as = world.spawn(generators.get(team).getLocation(world), ArmorStand.class);
             as.setVisible(false);
             as.setGravity(false);
             as.setMarker(true);
             asGenerators.put(team, as);
+
+            if (!team.isAvailable()) {
+                beds.get(team).getLocation(world).getBlock().setType(Material.AIR);
+                team.setHasBed(false);
+            }
         }
         for (Player player : players.keySet()) {
-            player.teleport(spawns.get(players.get(player)).getLocation(world));
             itemsTier.put(player, new TierTool(player));
             alreadyBought.put(player, new ArrayList<>());
+            resetPlayer(player);
         }
         Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
             for (Team team : teams) {
                 for (Block block : new Cuboid(new Location(world, spawns.get(team).getX() + baseRadius, 0, spawns.get(team).getZ() + baseRadius), new Location(world, spawns.get(team).getX() - baseRadius, 255, spawns.get(team).getZ() - baseRadius))) {
                     if (block.getType() == Material.WOOL || block.getType() == Material.STAINED_GLASS_PANE || block.getType() == Material.STAINED_GLASS || block.getType() == Material.STAINED_CLAY || block.getType() == Material.CARPET) {
-                        block.setData(DyeColor.getByColor(team.getColor()).getWoolData());
+                        block.setData(team.getColor().dye().getWoolData());
                     }
                     if (block.getType() == Material.BANNER) {
-                        block.setData(DyeColor.getByColor(team.getColor()).getDyeData());
+                        block.setData(team.getColor().dye().getDyeData());
                     }
                 }
             }
@@ -375,7 +388,7 @@ public class Arena {
     public void nextEvent() {
         if (gameEvent.getNext().equalsIgnoreCase("none")) {
             /**
-             * todo end the game
+             * todo end the game avec des goulags !
              */
             return;
         }
@@ -478,5 +491,102 @@ public class Arena {
 
     public HashMap<Player, List<ShopItems>> getAlreadyBought() {
         return alreadyBought;
+    }
+
+    public List<UUID> getAlreadyHypixel() {
+        return alreadyHypixel;
+    }
+
+    public void resetPlayer(Player player) {
+        respawnings.remove(player);
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(new ItemStack[4]);
+        player.getInventory().setHelmet(new CustomItemStack(Material.LEATHER_HELMET).setLeatherColor(players.get(player).getColor().bukkitColor()));
+        player.getInventory().setChestplate(new CustomItemStack(Material.LEATHER_CHESTPLATE).setLeatherColor(players.get(player).getColor().bukkitColor()));
+        player.getInventory().setLeggings(new CustomItemStack(Material.LEATHER_LEGGINGS).setLeatherColor(players.get(player).getColor().bukkitColor()));
+        player.getInventory().setBoots(new CustomItemStack(Material.LEATHER_BOOTS).setLeatherColor(players.get(player).getColor().bukkitColor()));
+        player.getInventory().addItem(new CustomItemStack(Material.WOOD_SWORD).setUnbreakable());
+        player.teleport(spawns.get(players.get(player)).getLocation(world));
+        player.setMaxHealth(20);
+        player.setHealth(20);
+        player.setFoodLevel(20);
+        player.setLevel(0);
+        player.setExp(0);
+        player.setFlying(false);
+        player.setAllowFlight(false);
+        player.setFallDistance(0);
+        player.getInventory().setHeldItemSlot(0);
+        for (ShopItems shopItems : getAlreadyBought().get(player)) {
+            if (!shopItems.getFamily().equalsIgnoreCase("")) {
+                TierTool tierTool = itemsTier.get(player);
+                if (tierTool.getUpgrades().containsKey(shopItems.getFamily())) {
+                    ShopItems max = ShopItems.getFromFamily(player, shopItems.getFamily(), tierTool.getUpgrades().get(shopItems.getFamily()));
+                    if (!max.isPermanent()) {
+                        if (max.getTier() == 1) {
+                            continue;
+                        } else {
+                            tierTool.getUpgrades().put(shopItems.getFamily(), max.getTier() - 1);
+                            shopItems = ShopItems.getFromFamily(player, shopItems.getFamily(), max.getTier() - 1);
+                        }
+                    }
+                }
+            }
+            if (shopItems.isArmor()) {
+                shopItems.giveArmor(player);
+            } else {
+                if (shopItems.getItem(player).getType().toString().contains("SWORD")) {
+                    player.getInventory().remove(Material.WOOD_SWORD);
+                }
+                player.getInventory().addItem(shopItems.getItem(player));
+            }
+        }
+
+    }
+
+    public void addRespawning(Player victim) {
+        Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
+            victim.spigot().respawn();
+            victim.teleport(lobby.getLocation(world));
+            victim.getInventory().clear();
+            victim.getInventory().setArmorContents(new ItemStack[4]);
+        }, 3L);
+        RespawnTask respawnTask = new RespawnTask(victim, this, 5);
+        respawnings.put(victim, respawnTask);
+        respawnTask.runTaskTimer(Main.getInstance(), 5, 20);
+        victim.setAllowFlight(true);
+        victim.setFlying(true);
+    }
+
+    public void addSpectator(Player player) {
+        player.teleport(lobby.getLocation(world));
+        player.setAllowFlight(true);
+        player.setFlying(true);
+        InventoryUtils.setSpectateInv(player, true);
+    }
+
+    public HashMap<Player, RespawnTask> getRespawnings() {
+        return respawnings;
+    }
+
+    public List<Player> getAllPlayers() {
+        List<Player> result = new ArrayList<>(players.keySet());
+        result.addAll(spectators);
+        return result;
+    }
+
+    public List<Player> getSpectators() {
+        return spectators;
+    }
+
+    public boolean isAvaibleBlock(Block block) {
+        if (block.getY() > heightLimit) {
+            return false;
+        }
+        for (Team team : spawns.keySet()) {
+            BedwarsLocation bwLoc = spawns.get(team);
+            Location loc = bwLoc.getLocation(world);
+            if (loc.distance(block.getLocation()) <= spawnProtection) return false;
+        }
+        return true;
     }
 }

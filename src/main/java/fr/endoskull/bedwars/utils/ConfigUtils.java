@@ -7,6 +7,10 @@ public class ConfigUtils {
 
     private static FileConfiguration config = Main.getInstance().getConfig();
 
+    private static boolean isGoulag() {
+        return config.getBoolean("goulag");
+    }
+
     public static int getGeneratorTimer(ShopItems.ShopMaterial material) {
         return config.getInt("generators." + material.getName() + ".delay");
     }
