@@ -8,6 +8,7 @@ import fr.endoskull.bedwars.utils.mobs.Silverfish;
 import fr.endoskull.bedwars.utils.mobs.VillagerShop;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftFireball;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -78,21 +79,23 @@ public class NmsUtils {
         return (Fireball) fb.getBukkitEntity();
     }
 
-    public static void minusAmount(Player p, ItemStack i, int amount) {
-        if (i.getAmount() - amount <= 0) {
-            p.getInventory().removeItem(i);
-            return;
+    public static void minusHand(Player p) {
+        if (p.getItemInHand().getAmount() > 1) {
+            ItemStack hand = p.getItemInHand();
+            hand.setAmount(hand.getAmount() - 1);
+            p.setItemInHand(hand);
+        } else {
+            p.setItemInHand(new ItemStack(Material.AIR));
         }
-        i.setAmount(i.getAmount() - amount);
         p.updateInventory();
     }
 
-    public static void spawnSilverfish(Location loc, Team bedWarsTeam, Arena game, double speed, double health, int despawn, double damage) {
-        Despawnable d = new Despawnable(Silverfish.spawn(loc, bedWarsTeam, game, speed, health, despawn, damage), bedWarsTeam, game, despawn, "{TeamColor}Silverfish");
+    public static void spawnSilverfish(Location loc, Team bedWarsTeam, Arena game, double speed, double health, int despawn, double damage, Player player) {
+        Despawnable d = new Despawnable(Silverfish.spawn(loc, bedWarsTeam, game, speed, health, despawn, damage), bedWarsTeam, game, despawn, "{TeamColor}Silverfish", player);
         d.setName();
     }
-    public static void spawnGolem(Location loc, Team bedWarsTeam, Arena game, double speed, double health, int despawn) {
-        Despawnable d = new Despawnable(Golem.spawn(loc, bedWarsTeam, game, speed, health, despawn), bedWarsTeam, game, despawn, "{TeamColor}{despawn}s §8[ {TeamColor}{health}§8]");
+    public static void spawnGolem(Location loc, Team bedWarsTeam, Arena game, double speed, double health, int despawn, Player player) {
+        Despawnable d = new Despawnable(Golem.spawn(loc, bedWarsTeam, game, speed, health, despawn), bedWarsTeam, game, despawn, "{TeamColor}{despawn}s §8[ {TeamColor}{health}§8]", player);
         d.setName();
     }
 

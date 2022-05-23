@@ -1,7 +1,9 @@
 package fr.endoskull.bedwars;
 
 import fr.endoskull.bedwars.board.FastBoard;
+import fr.endoskull.bedwars.commands.BedwarsCommand;
 import fr.endoskull.bedwars.listeners.CustomGuiListener;
+import fr.endoskull.bedwars.listeners.SpectatorListener;
 import fr.endoskull.bedwars.listeners.WaitingListener;
 import fr.endoskull.bedwars.listeners.playing.*;
 import fr.endoskull.bedwars.listeners.JoinListener;
@@ -16,6 +18,8 @@ import org.bukkit.Difficulty;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +28,7 @@ public class Main extends JavaPlugin {
     private static Main instance;
     private List<Arena> games = new ArrayList<>();
     private List<FastBoard> boards = new ArrayList<>();
+    private Scoreboard scoreboard;
 
     @Override
     public void onEnable() {
@@ -40,12 +45,15 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new DeathListener(this), this);
         pm.registerEvents(new ChestPlaceListener(), this);
         pm.registerEvents(new CustomGuiListener(), this);
+        pm.registerEvents(new SpectatorListener(), this);
+
+        getCommand("bedwars").setExecutor(new BedwarsCommand());
         super.onEnable();
         /*Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "time set 0");
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "gamerule doDaylightCycle false");
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "gamerule doWeatherCycle false");*/
-        MapManager.createRessource("map1");
-        MapManager.loadArena("map1");
+        MapManager.createRessource("world");
+        MapManager.loadArena("world");
         saveResource("languages/French.yml", false);
 
         for (Arena game : games) {
@@ -62,6 +70,10 @@ public class Main extends JavaPlugin {
         scheduler.runTaskTimer(this, new GameRunnable(this), 20, 20);
         scheduler.runTaskTimer(this, new ArmorStandTask(this), 20, 1);
         NmsUtils.registerEntities();
+
+        scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        Team team = scoreboard.registerNewTeam("default");
+        team.setPrefix("§7");
     }
 
     public static Main getInstance() {
@@ -74,5 +86,9 @@ public class Main extends JavaPlugin {
 
     public List<FastBoard> getBoards() {
         return boards;
+    }
+
+    public Scoreboard getScoreboard() {
+        return scoreboard;
     }
 }

@@ -9,6 +9,7 @@ import java.io.File;
 public enum MessagesUtils {
     YOU,
     BOUGHT_ITEM,
+    BOUGHT_UPGRADE,
     CANT_AFFORD,
     SHIFT_CLICK,
     DEFAULT_ITEM_LORE,
@@ -38,7 +39,21 @@ public enum MessagesUtils {
     REPLAY_PAPER,
     HEIGH_LIMIT,
     CANT_PLACE_HERE,
-    CANT_CHEST;
+    CANT_CHEST,
+    UPGRADES_TEXT,
+    COST,
+    UPGRADES_LESS,
+    UPGRADES_BUY,
+    UPGRADES_MAX,
+    GOULAG_CLOSE,
+    GOULAG_NOW,
+    END_BROADCAST,
+    ANYONE,
+    TEAM_ELIMINATE,
+    TRAP_MAX,
+    TRAP_ALREADY,
+    TRAP_TITLE,
+    MAGIC_MILK_END;
 
     public static String split(String message) {
         if (message.length() < 30) return message;
@@ -65,7 +80,11 @@ public enum MessagesUtils {
     }
 
     public static String getEventDisplayname(Player player, GameEvent gameEvent) {
-        return config.getString("events." + gameEvent.toString());
+        return config.getString("events." + gameEvent.toString() + ".name");
+    }
+
+    public static String getEventBroadcast(Player player, GameEvent gameEvent) {
+        return config.getString("events." + gameEvent.toString() + ".broadcast");
     }
 
     public static String getItemName(Player player, ShopItems item) {
@@ -76,11 +95,46 @@ public enum MessagesUtils {
         return config.getString("items." + item.name() + ".desc");
     }
 
+    public static String getUpgradeName(Player player, Upgrades upgrade, int tier) {
+        if (config.get("upgrades." + upgrade.name() + ".name") == null) {
+            if (tier < upgrade.getPrice().length) {
+                tier++;
+            }
+            return config.getString("upgrades." + upgrade.name() + "." + tier + ".name");
+        } else {
+            return config.getString("upgrades." + upgrade.name() + ".name");
+        }
+    }
+
+    public static String getUpgradeDesc(Player player, Upgrades upgrade) {
+        return config.getString("upgrades." + upgrade.name() + ".desc");
+    }
+
+    public static String getUpgradeSubDesc(Player player, Upgrades upgrade, int tier) {
+        return config.getString("upgrades." + upgrade.name() + "." + tier + ".desc");
+    }
+
+    public static String getTrapName(Player player, Traps trap) {
+        return config.getString("traps." + trap.name() + ".name");
+    }
+
+    public static String getTrapDesc(Player player, Traps trap) {
+        return config.getString("traps." + trap.name() + ".desc");
+    }
+
     public static String getCategoryName(Player player, ShopCategories category) {
         return config.getString("categories." + category.name());
     }
 
     public static String getMaterial(Player player, ShopItems.ShopMaterial material, int amount) {
         return config.getString(material.getName() + (amount > 1 ? "s" : ""));
+    }
+
+    public static String getKillMessage(Player player, DamageType damageType) {
+        return config.getString("kill-messages." + damageType.toString());
+    }
+
+    public static String getTeamDisplayName(Player player, String team) {
+        return config.getString("team." + team);
     }
 }

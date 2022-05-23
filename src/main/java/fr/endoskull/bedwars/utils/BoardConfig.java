@@ -2,6 +2,7 @@ package fr.endoskull.bedwars.utils;
 
 import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
+import fr.endoskull.bedwars.utils.bedwars.BedwarsPlayer;
 import fr.endoskull.bedwars.utils.bedwars.Team;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -51,10 +52,15 @@ public class BoardConfig {
                     if (team.isHasBed()) {
                         status = "§a✔";
                     } else {
-                        status = (game.getPlayersPerTeam(team).size() > 0 ? "§a" + game.getPlayersPerTeam(team).size() : "§c✖");
+                        int size = 0;
+                        for (BedwarsPlayer bwPLayer : game.getPlayersPerTeam(team)) {
+                            if (bwPLayer.isAlive()) size++;
+                        }
+                        status = (size > 0 ? "§a" + size : "§c✖");
                     }
-                    if (game.getPlayers().containsKey(player) && game.getPlayers().get(player).equals(team)) status += MessagesUtils.YOU.getMessage(player);
-                    lines.add(index, team.getColor().chat() + team.getDisplayName().substring(0, 1) + "§f " + team.getDisplayName() + "§f: " + status);
+                    BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(player.getUniqueId());
+                    if (bwPlayer != null && bwPlayer.getTeam().equals(team)) status += MessagesUtils.YOU.getMessage(player);
+                    lines.add(index, team.getColor().chat() + MessagesUtils.getTeamDisplayName(player, team.getName()).substring(0, 1) + "§f " + MessagesUtils.getTeamDisplayName(player, team.getName()) + "§f: " + status);
                     index++;
                 }
             }

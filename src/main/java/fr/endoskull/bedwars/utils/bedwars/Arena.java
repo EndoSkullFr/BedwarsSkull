@@ -1,20 +1,16 @@
 package fr.endoskull.bedwars.utils.bedwars;
 
+import fr.endoskull.api.commons.EndoSkullAPI;
 import fr.endoskull.api.spigot.utils.Hologram;
+import fr.endoskull.api.spigot.utils.Title;
 import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.tasks.RespawnTask;
 import fr.endoskull.bedwars.utils.*;
-import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Colorable;
-import org.bukkit.material.Wool;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.*;
 
@@ -26,6 +22,10 @@ public class Arena {
     private BedwarsLocation lobby;
     private BedwarsLocation corner1;
     private BedwarsLocation corner2;
+    private BedwarsLocation goulagSpawn1;
+    private BedwarsLocation goulagSpawn2;
+    private BedwarsLocation goulagLoc1;
+    private BedwarsLocation goulagLoc2;
     private GameState gameState = GameState.waiting;
     private int startTimer = 5;
     private GameEvent gameEvent = GameEvent.diamond2;
@@ -37,31 +37,33 @@ public class Arena {
     private int min;
     private int timer = 0;
 
-    private List<Team> teams = new ArrayList<>();
-    private HashMap<Team, BedwarsLocation> spawns = new HashMap<>();
-    private HashMap<Team, BedwarsLocation> beds = new HashMap<>();
-    private HashMap<Team, BedwarsLocation> generators = new HashMap<>();
-    private HashMap<Team, ArmorStand> asGenerators = new HashMap<>();
-    private HashMap<BedwarsLocation, ArmorStand> asDiamonds = new HashMap<>();
-    private HashMap<BedwarsLocation, Hologram> diamondsHologram = new HashMap<>();
-    private HashMap<BedwarsLocation, ArmorStand> asEmeralds = new HashMap<>();
-    private HashMap<BedwarsLocation, Hologram> emeraldsHologram = new HashMap<>();
-    private HashMap<Team, BedwarsLocation> shops = new HashMap<>();
-    private HashMap<Team, BedwarsLocation> upgrades = new HashMap<>();
-    private List<BedwarsLocation> emeraldGenerators = new ArrayList<>();
-    private List<BedwarsLocation> diamondGenerators = new ArrayList<>();
-    private HashMap<Player, Team> players = new HashMap<>();
-    private HashMap<Player, TierTool> itemsTier = new HashMap<>();
+    private final List<Team> teams = new ArrayList<>();
+    private final HashMap<Team, BedwarsLocation> spawns = new HashMap<>();
+    private final HashMap<Team, BedwarsLocation> beds = new HashMap<>();
+    private final HashMap<Team, BedwarsLocation> generators = new HashMap<>();
+    private final HashMap<Team, ArmorStand> asGenerators = new HashMap<>();
+    private final HashMap<BedwarsLocation, ArmorStand> asDiamonds = new HashMap<>();
+    private final HashMap<BedwarsLocation, Hologram> diamondsHologram = new HashMap<>();
+    private final HashMap<BedwarsLocation, ArmorStand> asEmeralds = new HashMap<>();
+    private final HashMap<BedwarsLocation, Hologram> emeraldsHologram = new HashMap<>();
+    private final HashMap<Team, BedwarsLocation> shops = new HashMap<>();
+    private final HashMap<Team, BedwarsLocation> upgrades = new HashMap<>();
+    private final List<BedwarsLocation> emeraldGenerators = new ArrayList<>();
+    private final List<BedwarsLocation> diamondGenerators = new ArrayList<>();
+    private final List<BedwarsPlayer> players = new ArrayList<>();
+    private final HashMap<Team, Integer> emeraldAtBaseTimer = new HashMap<>();
 
     private int diamondTimer;
     private int emeraldTimer;
     private int diamondTier;
     private int emeraldTier;
-    private List<Block> placedBlocks = new ArrayList<>();
-    private HashMap<Player, List<ShopItems>> alreadyBought = new HashMap<>();
+    private final List<Block> placedBlocks = new ArrayList<>();
+    private final List<Item> splitItems = new ArrayList<>();
     private final List<UUID> alreadyHypixel = new ArrayList<>();
-    private final HashMap<Player, RespawnTask> respawnings = new HashMap<>();
-    private final List<Player> spectators = new ArrayList<>();
+    private final List<ShopItems.ShopMaterial> genRest = new ArrayList<>();
+
+    private int goulagTimer;
+    private boolean goulagOpen = true;
 
     public Arena() {}
 
@@ -173,64 +175,33 @@ public class Arena {
         return teams;
     }
 
-    public void setTeams(List<Team> teams) {
-        this.teams = teams;
-    }
-
     public HashMap<Team, BedwarsLocation> getSpawns() {
         return spawns;
-    }
-
-    public void setSpawns(HashMap<Team, BedwarsLocation> spawns) {
-        this.spawns = spawns;
     }
 
     public HashMap<Team, BedwarsLocation> getBeds() {
         return beds;
     }
 
-    public void setBeds(HashMap<Team, BedwarsLocation> beds) {
-        this.beds = beds;
-    }
-
     public HashMap<Team, BedwarsLocation> getGenerators() {
         return generators;
-    }
-
-    public void setGenerators(HashMap<Team, BedwarsLocation> generators) {
-        this.generators = generators;
     }
 
     public HashMap<Team, BedwarsLocation> getShops() {
         return shops;
     }
 
-    public void setShops(HashMap<Team, BedwarsLocation> shops) {
-        this.shops = shops;
-    }
-
     public HashMap<Team, BedwarsLocation> getUpgrades() {
         return upgrades;
-    }
-
-    public void setUpgrades(HashMap<Team, BedwarsLocation> upgrades) {
-        this.upgrades = upgrades;
     }
 
     public List<BedwarsLocation> getEmeraldGenerators() {
         return emeraldGenerators;
     }
 
-    public void setEmeraldGenerators(List<BedwarsLocation> emeraldGenerators) {
-        this.emeraldGenerators = emeraldGenerators;
-    }
 
     public List<BedwarsLocation> getDiamondGenerators() {
         return diamondGenerators;
-    }
-
-    public void setDiamondGenerators(List<BedwarsLocation> diamondGenerators) {
-        this.diamondGenerators = diamondGenerators;
     }
 
     public int getSpawnProtection() {
@@ -272,12 +243,8 @@ public class Arena {
         this.maxTeamSize = maxTeamSize;
     }
 
-    public HashMap<Player, Team> getPlayers() {
+    public List<BedwarsPlayer> getPlayers() {
         return players;
-    }
-
-    public void setPlayers(HashMap<Player, Team> players) {
-        this.players = players;
     }
 
     public int getMin() {
@@ -291,17 +258,17 @@ public class Arena {
     public void addPlayer(Player player) {
         player.teleport(lobby.getLocation(world));
         InventoryUtils.setWaitingInv(player);
-        players.put(player, null);
+        players.add(new BedwarsPlayer(player, null, true, false, false, this));
         if (gameState == GameState.waiting && players.size() >= min) {
             gameState = GameState.starting;
         }
     }
 
-    public List<Player> getPlayersPerTeam(Team team) {
-        List<Player> result = new ArrayList<>();
-        for (Player player : players.keySet()) {
-            if (players.get(player) != null) {
-                if (players.get(player).equals(team)) result.add(player);
+    public List<BedwarsPlayer> getPlayersPerTeam(Team team) {
+        List<BedwarsPlayer> result = new ArrayList<>();
+        for (BedwarsPlayer bwPlayer : players) {
+            if (bwPlayer.getTeam() != null) {
+                if (bwPlayer.getTeam().equals(team)) result.add(bwPlayer);
             }
         }
         return result;
@@ -334,13 +301,12 @@ public class Arena {
             hologram.spawn();
             emeraldsHologram.put(emeraldGenerator, hologram);
         }
-        List<Player> pls = new ArrayList<>(this.players.keySet());
-        Collections.shuffle(pls);
+        Collections.shuffle(players);
         int i = 0;
         for (Team team : teams) {
             if (getPlayersPerTeam(team).size() >= maxTeamSize) continue;
             if (players.size() <= i) break;
-            players.putIfAbsent(pls.get(i), team);
+            players.get(i).setTeam(team);
             i++;
         }
         for (Team team : teams) {
@@ -351,22 +317,33 @@ public class Arena {
             villager.setProfession(Villager.Profession.FARMER);
             setNoAI(villager);
             setSilent(villager);*/
-            NmsUtils.spawnVillager(shops.get(team).getLocation(world), "§aSHOP");
+            if (!shops.get(team).getLocation(world).getChunk().isLoaded()) shops.get(team).getLocation(world).getChunk().load();
+            NmsUtils.spawnVillager(shops.get(team).getLocation(world), "§a§lSHOP");
+            if (!upgrades.get(team).getLocation(world).getChunk().isLoaded()) upgrades.get(team).getLocation(world).getChunk().load();
+            NmsUtils.spawnVillager(upgrades.get(team).getLocation(world), "§a§lUPGRADES");
             ArmorStand as = world.spawn(generators.get(team).getLocation(world), ArmorStand.class);
             as.setVisible(false);
             as.setGravity(false);
             as.setMarker(true);
             asGenerators.put(team, as);
+            team.setUpgrades(new TeamUpgrade(team));
+
+            org.bukkit.scoreboard.Team sbTeam = Main.getInstance().getScoreboard().registerNewTeam(teams.indexOf(team) + world.getName() + "-" + team.getName());
+            sbTeam.setPrefix(team.getColor().chat() + "§l" + team.getName().substring(0, 1).toUpperCase() + " " + team.getColor().chat());
+            sbTeam.setCanSeeFriendlyInvisibles(true);
 
             if (!team.isAvailable()) {
                 beds.get(team).getLocation(world).getBlock().setType(Material.AIR);
                 team.setHasBed(false);
             }
         }
-        for (Player player : players.keySet()) {
-            itemsTier.put(player, new TierTool(player));
-            alreadyBought.put(player, new ArrayList<>());
-            resetPlayer(player);
+        for (BedwarsPlayer bwPlayer : players) {
+            bwPlayer.reset();
+            org.bukkit.scoreboard.Team team = Main.getInstance().getScoreboard().getTeams().stream().filter(t -> t.getName().equalsIgnoreCase(teams.indexOf(bwPlayer.getTeam()) + world.getName() + "-" + bwPlayer.getTeam().getName())).findFirst().orElse(null);
+            if (team != null) {
+                team.addPlayer(bwPlayer.getPlayer());
+            }
+            bwPlayer.getPlayer().getEnderChest().clear();
         }
         Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
             for (Team team : teams) {
@@ -383,23 +360,80 @@ public class Arena {
         for (Block block : new Cuboid(corner1.getLocation(world), corner2.getLocation(world))) {
             if (block.getType() != Material.AIR) block.setType(Material.AIR);
         }
+        for (Block block : new Cuboid(goulagLoc1.getLocation(world), goulagLoc2.getLocation(world))) {
+            block.setType(Material.STAINED_GLASS_PANE);
+            block.setData(DyeColor.RED.getWoolData());
+        }
+
+        world.getWorldBorder().setCenter(lobby.getLocation(world));
+        world.getWorldBorder().setSize(borderSize);
+        if (teams.size() < 3 || true) {
+            goulagOpen = false;
+            for (BedwarsPlayer bwPlayer : players) {
+                Player player = bwPlayer.getPlayer();
+                if (player == null) continue;
+                player.sendMessage("");
+                player.sendMessage(MessagesUtils.GOULAG_CLOSE.getMessage(player));
+                player.sendMessage("");
+            }
+        }
     }
 
     public void nextEvent() {
+        for (Player player : getAllPlayers()) {
+            player.sendMessage(MessagesUtils.getEventBroadcast(player, gameEvent));
+        }
         if (gameEvent.getNext().equalsIgnoreCase("none")) {
             /**
              * todo end the game avec des goulags !
              */
             return;
         }
+        if (gameEvent == GameEvent.diamond2) {
+            setDiamondTier(2);
+            for (Player player : getAllPlayers()) {
+                player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
+            }
+        }
+        if (gameEvent == GameEvent.diamond3) {
+            setDiamondTier(3);
+            for (Player player : getAllPlayers()) {
+                player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
+            }
+        }
+        if (gameEvent == GameEvent.emerald2) {
+            setEmeraldTier(2);
+            for (Player player : getAllPlayers()) {
+                player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
+            }
+        }
+        if (gameEvent == GameEvent.emerald3) {
+            setEmeraldTier(3);
+            for (Player player : getAllPlayers()) {
+                player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
+            }
+        }
+        if (gameEvent == GameEvent.bedDestroy) {
+            for (Team team : teams) {
+                if (team.isHasBed()) {
+                    beds.get(team).getLocation(world).getBlock().setType(Material.AIR);
+                    team.setHasBed(false);
+                    for (BedwarsPlayer bwPlayer : getPlayersPerTeam(team)) {
+                        Player player = bwPlayer.getPlayer();
+                        if (player == null) return;
+                        Title.sendTitle(player, 10, 40, 10, MessagesUtils.BED_BREAK_TITLE.getMessage(player), MessagesUtils.BED_BREAK_SUBTITLE.getMessage(player));
+                    }
+                }
+            }
+            for (Player player : getAllPlayers()) {
+                player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 1f, 1f);
+            }
+        }
         gameEvent = GameEvent.valueOf(gameEvent.getNext());
         eventTimer = gameEvent.getDuration();
-        /**
-         * todo broadcast event
-         */
     }
 
-    private void setNoAI(Entity bukkitEntity) {
+    /*private void setNoAI(Entity bukkitEntity) {
         net.minecraft.server.v1_8_R3.Entity nmsEntity = ((CraftEntity) bukkitEntity).getHandle();
         NBTTagCompound tag = nmsEntity.getNBTTag();
         if (tag == null) {
@@ -419,7 +453,7 @@ public class Arena {
         nmsEntity.c(tag);
         tag.setInt("Silent", 1);
         nmsEntity.f(tag);
-    }
+    }*/
 
     public int getTimer() {
         return timer;
@@ -431,10 +465,6 @@ public class Arena {
 
     public HashMap<Team, ArmorStand> getAsGenerators() {
         return asGenerators;
-    }
-
-    public HashMap<Player, TierTool> getItemsTier() {
-        return itemsTier;
     }
 
     public int getDiamondTimer() {
@@ -489,93 +519,59 @@ public class Arena {
         return placedBlocks;
     }
 
-    public HashMap<Player, List<ShopItems>> getAlreadyBought() {
-        return alreadyBought;
-    }
-
     public List<UUID> getAlreadyHypixel() {
         return alreadyHypixel;
     }
 
-    public void resetPlayer(Player player) {
-        respawnings.remove(player);
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(new ItemStack[4]);
-        player.getInventory().setHelmet(new CustomItemStack(Material.LEATHER_HELMET).setLeatherColor(players.get(player).getColor().bukkitColor()));
-        player.getInventory().setChestplate(new CustomItemStack(Material.LEATHER_CHESTPLATE).setLeatherColor(players.get(player).getColor().bukkitColor()));
-        player.getInventory().setLeggings(new CustomItemStack(Material.LEATHER_LEGGINGS).setLeatherColor(players.get(player).getColor().bukkitColor()));
-        player.getInventory().setBoots(new CustomItemStack(Material.LEATHER_BOOTS).setLeatherColor(players.get(player).getColor().bukkitColor()));
-        player.getInventory().addItem(new CustomItemStack(Material.WOOD_SWORD).setUnbreakable());
-        player.teleport(spawns.get(players.get(player)).getLocation(world));
-        player.setMaxHealth(20);
-        player.setHealth(20);
-        player.setFoodLevel(20);
-        player.setLevel(0);
-        player.setExp(0);
-        player.setFlying(false);
-        player.setAllowFlight(false);
-        player.setFallDistance(0);
-        player.getInventory().setHeldItemSlot(0);
-        for (ShopItems shopItems : getAlreadyBought().get(player)) {
-            if (!shopItems.getFamily().equalsIgnoreCase("")) {
-                TierTool tierTool = itemsTier.get(player);
-                if (tierTool.getUpgrades().containsKey(shopItems.getFamily())) {
-                    ShopItems max = ShopItems.getFromFamily(player, shopItems.getFamily(), tierTool.getUpgrades().get(shopItems.getFamily()));
-                    if (!max.isPermanent()) {
-                        if (max.getTier() == 1) {
-                            continue;
-                        } else {
-                            tierTool.getUpgrades().put(shopItems.getFamily(), max.getTier() - 1);
-                            shopItems = ShopItems.getFromFamily(player, shopItems.getFamily(), max.getTier() - 1);
-                        }
-                    }
-                }
-            }
-            if (shopItems.isArmor()) {
-                shopItems.giveArmor(player);
-            } else {
-                if (shopItems.getItem(player).getType().toString().contains("SWORD")) {
-                    player.getInventory().remove(Material.WOOD_SWORD);
-                }
-                player.getInventory().addItem(shopItems.getItem(player));
-            }
-        }
-
+    public BedwarsLocation getGoulagSpawn1() {
+        return goulagSpawn1;
     }
 
-    public void addRespawning(Player victim) {
-        Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
-            victim.spigot().respawn();
-            victim.teleport(lobby.getLocation(world));
-            victim.getInventory().clear();
-            victim.getInventory().setArmorContents(new ItemStack[4]);
-        }, 3L);
-        RespawnTask respawnTask = new RespawnTask(victim, this, 5);
-        respawnings.put(victim, respawnTask);
-        respawnTask.runTaskTimer(Main.getInstance(), 5, 20);
-        victim.setAllowFlight(true);
-        victim.setFlying(true);
+    public void setGoulagSpawn1(BedwarsLocation goulagSpawn1) {
+        this.goulagSpawn1 = goulagSpawn1;
     }
 
-    public void addSpectator(Player player) {
-        player.teleport(lobby.getLocation(world));
-        player.setAllowFlight(true);
-        player.setFlying(true);
-        InventoryUtils.setSpectateInv(player, true);
+    public BedwarsLocation getGoulagSpawn2() {
+        return goulagSpawn2;
     }
 
-    public HashMap<Player, RespawnTask> getRespawnings() {
-        return respawnings;
+    public void setGoulagSpawn2(BedwarsLocation goulagSpawn2) {
+        this.goulagSpawn2 = goulagSpawn2;
+    }
+
+    public BedwarsLocation getGoulagLoc1() {
+        return goulagLoc1;
+    }
+
+    public void setGoulagLoc1(BedwarsLocation goulagLoc1) {
+        this.goulagLoc1 = goulagLoc1;
+    }
+
+    public BedwarsLocation getGoulagLoc2() {
+        return goulagLoc2;
+    }
+
+    public void setGoulagLoc2(BedwarsLocation goulagLoc2) {
+        this.goulagLoc2 = goulagLoc2;
     }
 
     public List<Player> getAllPlayers() {
-        List<Player> result = new ArrayList<>(players.keySet());
-        result.addAll(spectators);
+        List<Player> result = new ArrayList<>();
+        for (BedwarsPlayer bwPlayer : players) {
+            Player player = bwPlayer.getPlayer();
+            if (player == null) continue;
+            result.add(player);
+        }
         return result;
     }
-
-    public List<Player> getSpectators() {
-        return spectators;
+    public List<Player> getIngamePlayers() {
+        List<Player> result = new ArrayList<>();
+        for (BedwarsPlayer bwPlayer : players) {
+            Player player = bwPlayer.getPlayer();
+            if (player == null || bwPlayer.isSpectator()) continue;
+            result.add(player);
+        }
+        return result;
     }
 
     public boolean isAvaibleBlock(Block block) {
@@ -585,8 +581,138 @@ public class Arena {
         for (Team team : spawns.keySet()) {
             BedwarsLocation bwLoc = spawns.get(team);
             Location loc = bwLoc.getLocation(world);
-            if (loc.distance(block.getLocation()) <= spawnProtection) return false;
+            if (loc.distance(block.getLocation().clone().add(0.5, 0.5, 0.5)) <= spawnProtection) return false;
+        }
+        for (BedwarsLocation diamondGenerator : diamondGenerators) {
+            Location loc = diamondGenerator.getLocation(world);
+            if (loc.distance(block.getLocation().clone().add(0.5, 0.5, 0.5)) < 3) {
+                return false;
+            }
+        }
+        for (BedwarsLocation emeraldGenerator : emeraldGenerators) {
+            Location loc = emeraldGenerator.getLocation(world);
+            if (loc.distance(block.getLocation().clone().add(0.5, 0.5, 0.5)) < 3) {
+                return false;
+            }
         }
         return true;
+    }
+
+    public Player getPlayerByUUID(UUID uuid) {
+        return getIngamePlayers().stream().filter(player -> player.getUniqueId().equals(uuid)).findFirst().orElse(null);
+    }
+
+    public List<Item> getSplitItems() {
+        return splitItems;
+    }
+
+    public List<ShopItems.ShopMaterial> getGenRest() {
+        return genRest;
+    }
+
+    public HashMap<Team, Integer> getEmeraldAtBaseTimer() {
+        return emeraldAtBaseTimer;
+    }
+
+    public int getGoulagTimer() {
+        return goulagTimer;
+    }
+
+    public void setGoulagTimer(int goulagTimer) {
+        this.goulagTimer = goulagTimer;
+    }
+
+    public boolean isGoulagOpen() {
+        return goulagOpen;
+    }
+
+    public BedwarsPlayer getBwPlayerByUUID(UUID uuid) {
+        return players.stream().filter(bedwarsPlayer -> bedwarsPlayer.getUuid().equals(uuid)).findFirst().orElse(null);
+    }
+
+    public void checkTeam(Team team) {
+        int i = 0;
+        for (BedwarsPlayer bedwarsPlayer : getPlayersPerTeam(team)) {
+            if (bedwarsPlayer.isAlive()) i++;
+        }
+        if (i == 0) {
+            for (Player player : getAllPlayers()) {
+                player.sendMessage(MessagesUtils.TEAM_ELIMINATE.getMessage(player).replace("%team%", team.getColor().chat() + MessagesUtils.getTeamDisplayName(player, team.getName())));
+                player.playSound(player.getLocation(), Sound.ORB_PICKUP, 1, 1);
+            }
+            checkWin();
+        }
+    }
+
+    public void setGoulagOpen(boolean goulagOpen) {
+        this.goulagOpen = goulagOpen;
+    }
+
+    public void checkWin() {
+        if (gameState != GameState.playing) return;
+        int teamNumber = 0;
+        Team lastTeam = null;
+        for (Team team : teams) {
+            if (!team.isAvailable()) continue;
+            int pls = 0;
+            for (BedwarsPlayer bedwarsPlayer : getPlayersPerTeam(team)) {
+                if (bedwarsPlayer.isAlive()) pls++;
+            }
+            if (pls > 0) {
+                teamNumber++;
+                lastTeam = team;
+            }
+        }
+        if (teamNumber < 2) {
+            gameState = GameState.finish;
+            List<BedwarsPlayer> bestPlayers = new ArrayList<>();
+            for (BedwarsPlayer bedwarsPlayer : players) {
+                if (bedwarsPlayer.getTeam() == null) continue;
+                bestPlayers.add(bedwarsPlayer);
+            }
+            bestPlayers.sort(new KillComparator());
+            /*for (BedwarsPlayer bwP : players) {
+                if (bwP.getTeam() == null) continue;
+                BedwarsPlayer best = null;
+                for (BedwarsPlayer bedwarsPlayer : players) {
+                    if (bedwarsPlayer.getTeam() == null) continue;
+                    if (bestPlayers.contains(bedwarsPlayer)) continue;
+                    if (best == null) {
+                        best = bedwarsPlayer;
+                    } else if (bedwarsPlayer.getKill() > best.getKill()) {
+                        best = bedwarsPlayer;
+                    }
+                }
+                if (best != null) bestPlayers.add(best);
+            }*/
+
+            for (Player pls : getAllPlayers()) {
+                pls.playSound(pls.getLocation(), Sound.ENDERDRAGON_WINGS, 1, 1);
+                pls.playSound(pls.getLocation(), Sound.ENDERDRAGON_GROWL, 1, 1);
+                String message = MessagesUtils.END_BROADCAST.getMessage(pls);
+                if (lastTeam == null) {
+                    message = message.replace("%team%", MessagesUtils.ANYONE.getMessage(pls));
+                } else {
+                    message = message.replace("%team%", lastTeam.getColor().chat() + MessagesUtils.getTeamDisplayName(pls, lastTeam.getName()));
+                }
+                if (bestPlayers.size() >= 1) {
+                    message = message.replace("%first%", EndoSkullAPI.getPrefix(bestPlayers.get(0).getUuid()) + bestPlayers.get(0).getName() + " §8- §7" + bestPlayers.get(0).getKill());
+                } else {
+                    message = message.replace("%first%", MessagesUtils.ANYONE.getMessage(pls));
+                }
+                if (bestPlayers.size() >= 2) {
+                    message = message.replace("%second%", EndoSkullAPI.getPrefix(bestPlayers.get(1).getUuid()) + bestPlayers.get(1).getName() + " §8- §7" + bestPlayers.get(1).getKill());
+                } else {
+                    message = message.replace("%second%", MessagesUtils.ANYONE.getMessage(pls));
+                }
+                if (bestPlayers.size() >= 3) {
+                    message = message.replace("%third%", EndoSkullAPI.getPrefix(bestPlayers.get(2).getUuid()) + bestPlayers.get(2).getName() + " §8- §7" + bestPlayers.get(2).getKill());
+                } else {
+                    message = message.replace("%third%", MessagesUtils.ANYONE.getMessage(pls));
+                }
+                pls.sendMessage(message);
+            }
+        }
+
     }
 }

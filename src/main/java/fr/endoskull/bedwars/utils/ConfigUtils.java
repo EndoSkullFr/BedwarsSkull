@@ -46,4 +46,12 @@ public class ConfigUtils {
         }
         return roman.toString();
     }
+
+    public static int getGoulagTimer() {
+        return config.getInt("goulag-timer");
+    }
+
+    public static int getEmeraldAtBaseTimer() {
+        return config.getInt("generators.emerald-at-base");
+    }
 }

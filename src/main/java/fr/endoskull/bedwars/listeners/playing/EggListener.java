@@ -24,6 +24,7 @@ import fr.endoskull.bedwars.tasks.EggBridgeTask;
 import fr.endoskull.bedwars.utils.GameUtils;
 import fr.endoskull.bedwars.utils.NmsUtils;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
+import fr.endoskull.bedwars.utils.bedwars.BedwarsPlayer;
 import fr.endoskull.bedwars.utils.mobs.Golem;
 import fr.endoskull.bedwars.utils.mobs.Silverfish;
 import net.minecraft.server.v1_8_R3.EntityIronGolem;
@@ -63,12 +64,13 @@ public class EggListener implements Listener {
                 Player shooter = (Player) projectile.getShooter();
                 Arena arena = GameUtils.getGame(shooter);
                 if (arena != null) {
-                    if (arena.getPlayers().containsKey(shooter)) {
+                    BedwarsPlayer bwPlayer = arena.getBwPlayerByUUID(shooter.getUniqueId());
+                    if (!bwPlayer.isSpectator() && !bwPlayer.isRespawning()) {
                         if (event.isCancelled()) {
                             event.setCancelled(true);
                             return;
                         }
-                        bridges.put(projectile, new EggBridgeTask(shooter, projectile, arena.getPlayers().get(shooter).getColor().dye()));
+                        bridges.put(projectile, new EggBridgeTask(shooter, projectile, bwPlayer.getTeam().getColor().dye()));
                     }
                 }
             }
@@ -86,7 +88,8 @@ public class EggListener implements Listener {
             Player player = (Player) snowball.getShooter();
             Arena arena = GameUtils.getGame(player);
             if (arena == null) return;
-            NmsUtils.spawnSilverfish(e.getEntity().getLocation(), arena.getPlayers().get(player), arena, 0.25, 8, 15, 4);
+            BedwarsPlayer bwPlayer = arena.getBwPlayerByUUID(player.getUniqueId());
+            NmsUtils.spawnSilverfish(e.getEntity().getLocation(), bwPlayer.getTeam(), arena, 0.25, 8, 15, 4, player);
         }
     }
 
@@ -99,8 +102,9 @@ public class EggListener implements Listener {
         ItemStack current = e.getItem();
         if (current == null || current.getType() == Material.AIR) return;
         if (current.getType() != Material.MONSTER_EGG || current.getDurability() != (short) 99) return;
-        NmsUtils.minusAmount(player, current, 1);
-        NmsUtils.spawnGolem(e.getClickedBlock().getLocation().clone().add(0.5, 1, 0.5), game.getPlayers().get(player), game, 0.25, 100, 240);
+        BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(player.getUniqueId());
+        NmsUtils.minusHand(player);
+        NmsUtils.spawnGolem(e.getClickedBlock().getLocation().clone().add(0.5, 1, 0.5), bwPlayer.getTeam(), game, 0.25, 100, 240, player);
     }
 
     /**
@@ -138,8 +142,9 @@ public class EggListener implements Listener {
                 Silverfish silverfish = (Silverfish) es;
                 Arena game = GameUtils.getGame(player);
                 if (game == null) return;
-                if (!game.getPlayers().containsKey(player)) return;
-                if (game.getPlayers().get(player).equals(silverfish.getTeam())) e.setCancelled(true);
+                BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(player.getUniqueId());
+                if (bwPlayer.isSpectator() || bwPlayer.isRespawning()) return;
+                if (bwPlayer.getTeam().equals(silverfish.getTeam())) e.setCancelled(true);
             }
         } else if (e.getEntity() instanceof IronGolem) {
             IronGolem g = (IronGolem) e.getEntity();
@@ -148,8 +153,9 @@ public class EggListener implements Listener {
                 Golem golem = (Golem) eg;
                 Arena game = GameUtils.getGame(player);
                 if (game == null) return;
-                if (!game.getPlayers().containsKey(player)) return;
-                if (game.getPlayers().get(player).equals(golem.getTeam())) e.setCancelled(true);
+                BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(player.getUniqueId());
+                if (bwPlayer.isSpectator() || bwPlayer.isRespawning()) return;
+                if (bwPlayer.getTeam().equals(golem.getTeam())) e.setCancelled(true);
             }
         }
     }

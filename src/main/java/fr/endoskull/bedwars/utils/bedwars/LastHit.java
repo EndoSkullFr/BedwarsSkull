@@ -20,6 +20,7 @@
 
 package fr.endoskull.bedwars.utils.bedwars;
 
+import fr.endoskull.bedwars.utils.DamageType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -29,13 +30,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LastHit {
 
     private UUID victim;
-    private Entity damager;
+    private UUID damager;
+    private DamageType type;
     private long time;
     private static ConcurrentHashMap<UUID, LastHit> lastHit = new ConcurrentHashMap<>();
 
-    public LastHit(Player victim, Entity damager, long time) {
+    public LastHit(Player victim, UUID damager, DamageType type, long time) {
         this.victim = victim.getUniqueId();
         this.damager = damager;
+        this.type = type;
         this.time = time;
         lastHit.put(victim.getUniqueId(), this);
     }
@@ -44,11 +47,11 @@ public class LastHit {
         this.time = time;
     }
 
-    public void setDamager(Entity damager) {
+    public void setDamager(UUID damager) {
         this.damager = damager;
     }
 
-    public Entity getDamager() {
+    public UUID getDamager() {
         return damager;
     }
 
@@ -66,5 +69,17 @@ public class LastHit {
 
     public static LastHit getLastHit(Player player) {
         return lastHit.getOrDefault(player.getUniqueId(), null);
+    }
+
+    public DamageType getType() {
+        return type;
+    }
+
+    public void setType(DamageType type) {
+        this.type = type;
+    }
+
+    public static ConcurrentHashMap<UUID, LastHit> getLastHit() {
+        return lastHit;
     }
 }

@@ -67,8 +67,8 @@ public class Silverfish extends EntitySilverfish {
         this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget(this, EntityHuman.class, 20, true, false, player -> {
             if (player == null) return false;
             Player p = ((EntityPlayer) player).getBukkitEntity();
-            if (!arena.getPlayers().containsKey(p)) return false;
-            return ((EntityHuman)player).isAlive() && !arena.getPlayers().get(p).equals(team);/* && !team.getArena().isReSpawning(((EntityHuman)player).getUniqueID())
+            if (arena.getBwPlayerByUUID(p.getUniqueId()) == null) return false;
+            return ((EntityHuman)player).isAlive() && !arena.getBwPlayerByUUID(p.getUniqueId()).getTeam().equals(team);/* && !team.getArena().isReSpawning(((EntityHuman)player).getUniqueID())
                     && !team.getArena().isSpectator(((EntityHuman)player).getUniqueID()*/
         }));
         this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget(this, IronGolem.class, 20, true, false, golem -> {

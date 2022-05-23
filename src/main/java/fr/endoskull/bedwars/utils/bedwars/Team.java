@@ -1,23 +1,17 @@
 package fr.endoskull.bedwars.utils.bedwars;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.List;
+import fr.endoskull.bedwars.utils.Upgrades;
 
 public class Team {
 
     private String name;
-    private String displayName;
     private TeamColor color;
     private boolean hasBed = true;
     private boolean available = false;
+    private TeamUpgrade upgrades;
 
-    public Team(String name, String displayName, TeamColor color) {
+    public Team(String name, TeamColor color) {
         this.name = name;
-        this.displayName = displayName;
         this.color = color;
     }
 
@@ -45,19 +39,19 @@ public class Team {
         this.hasBed = hasBed;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
     public boolean isAvailable() {
         return available;
     }
 
     public void setAvailable(boolean available) {
         this.available = available;
+    }
+
+    public void setUpgrades(TeamUpgrade upgrades) {
+        this.upgrades = upgrades;
+    }
+
+    public TeamUpgrade getUpgrades() {
+        return upgrades;
     }
 }

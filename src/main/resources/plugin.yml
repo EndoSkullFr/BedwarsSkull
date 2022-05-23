@@ -1,8 +1,28 @@
 name: BedwarsSkull
 version: 1.0
-authors: [BebedlaStreat, ZeFreestyle]
+author: BebedlaStreat
 description: Bedwars plugin for EndoSkull
 main: fr.endoskull.bedwars.Main
+website: endoskull.fr
+prefix: Bedwars
 commands:
   bedwars:
     aliases: [bw]
+permissions:
+  bedwars.*:
+    description: allow every bedwars commands
+    children:
+      bedwars.start: true
+      bedwars.admin: true
+  bedwars.admin:
+    children:
+      bedwars.start: true
+      bedwars.forcestart: true
+      bedwars.checkwin: true
+  bedwars.start:
+    description: allow to start a bedwars game
+  bedwars.forcestart:
+    description: force the begin of the game
+  bedwars.checkwin:
+    description: force checking the win in the game
+

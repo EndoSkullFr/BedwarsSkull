@@ -4,6 +4,7 @@ import fr.endoskull.bedwars.utils.GameState;
 import fr.endoskull.bedwars.utils.GameUtils;
 import fr.endoskull.bedwars.utils.MessagesUtils;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
+import fr.endoskull.bedwars.utils.bedwars.BedwarsPlayer;
 import fr.endoskull.bedwars.utils.tower.TowerEast;
 import fr.endoskull.bedwars.utils.tower.TowerNorth;
 import fr.endoskull.bedwars.utils.tower.TowerSouth;
@@ -24,15 +25,16 @@ public class ChestPlaceListener implements Listener {
     Player player = e.getPlayer();
     Arena game = GameUtils.getGame(player);
     if (game == null) return;
+    BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(player.getUniqueId());
     if (!game.isAvaibleBlock(e.getBlock())) return;
     if (game.getGameState() != GameState.playing) return;
     if (e.getBlockPlaced().getType() == Material.CHEST && 
-      game.getPlayers().containsKey(player) &&
+      bwPlayer.isAlive() &&
       !e.isCancelled()) {
       e.setCancelled(true);
       Location loc = e.getBlockPlaced().getLocation();
       Block chest = e.getBlockPlaced();
-      DyeColor col = game.getPlayers().get(player).getColor().dye();
+      DyeColor col = bwPlayer.getTeam().getColor().dye();
       double rotation = ((player.getLocation().getYaw() - 90.0F) % 360.0F);
       if (rotation < 0.0D)
         rotation += 360.0D; 

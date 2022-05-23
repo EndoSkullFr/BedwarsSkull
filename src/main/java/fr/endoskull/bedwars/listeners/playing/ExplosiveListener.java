@@ -7,6 +7,7 @@ import fr.endoskull.bedwars.utils.GameState;
 import fr.endoskull.bedwars.utils.GameUtils;
 import fr.endoskull.bedwars.utils.NmsUtils;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
+import fr.endoskull.bedwars.utils.bedwars.BedwarsPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -65,9 +66,11 @@ public class ExplosiveListener implements Listener {
             if (game.getGameState() != GameState.playing) return;
             List<Block> destroyed = e.blockList();
             for (Block block : new ArrayList<>(destroyed)) {
+                if (block.getType() == Material.STAINED_GLASS) {
+                    e.blockList().clear();
+                    break;
+                }
                 if (!game.getPlacedBlocks().contains(block)) {
-                    e.blockList().remove(block);
-                } else if (block.getType().toString().contains("_GLASS")) {
                     e.blockList().remove(block);
                 }
             }
@@ -83,9 +86,13 @@ public class ExplosiveListener implements Listener {
             if (game.getGameState() != GameState.playing) return;
             List<Block> destroyed = e.blockList();
             for (Block block : new ArrayList<>(destroyed)) {
+                if (block.getType() == Material.STAINED_GLASS) {
+                    e.blockList().clear();
+                    break;
+                }
                 if (!game.getPlacedBlocks().contains(block)) {
                     e.blockList().remove(block);
-                } else if (block.getType().toString().contains("_GLASS") || block.getType() == Material.ENDER_STONE || block.getType() == Material.STAINED_CLAY) {
+                } else if (block.getType() == Material.ENDER_STONE || block.getType() == Material.STAINED_CLAY) {
                     e.blockList().remove(block);
                 }
             }
@@ -102,7 +109,8 @@ public class ExplosiveListener implements Listener {
             Arena a = GameUtils.getGame(p);
             if (a != null) {
                 if (a.getGameState() != GameState.playing) return;
-                if (a.getPlayers().containsKey(p)) {
+                BedwarsPlayer bwPlayer = a.getBwPlayerByUUID(p.getUniqueId());
+                if (!bwPlayer.isSpectator() && !bwPlayer.isRespawning()) {
                     if (inHand.getType() == Material.FIREBALL) {
                         e.setCancelled(true);
                         if (fireballCooldown.containsKey(p.getUniqueId()) && fireballCooldown.get(p.getUniqueId()) > System.currentTimeMillis()) return;
@@ -113,7 +121,7 @@ public class ExplosiveListener implements Listener {
                         fb.setIsIncendiary(false);
                         fb.setMetadata("bw1058", new FixedMetadataValue(main, "ceva"));
                         fb.setYield(3);
-                        NmsUtils.minusAmount(p, inHand, 1);
+                        NmsUtils.minusHand(p);
                         fireballCooldown.put(p.getUniqueId(), System.currentTimeMillis() + 1000);
                     }
                 }
@@ -129,14 +137,24 @@ public class ExplosiveListener implements Listener {
             if (game.getGameState() != GameState.playing) return;
             double radius = e.getRadius();
             Block block = e.getEntity().getLocation().getBlock();
+            List<Block> toBreak = new ArrayList<>();
             for (Block b : new Cuboid(block.getLocation().clone().add(radius, radius, radius), block.getLocation().clone().subtract(radius, radius, radius))) {
                 if (b.getLocation().distance(block.getLocation()) <= radius) {
                     if (!game.getPlacedBlocks().contains(b)) continue;
+                    if (b.getType() == Material.STAINED_GLASS) {
+                        toBreak.clear();
+                        break;
+                    }
                     if (b.getType() == Material.WOOD || b.getType() == Material.LADDER || b.getType() == Material.WOOL) {
-                        b.breakNaturally(new ItemStack(Material.DIAMOND_AXE));
-                        game.getPlacedBlocks().remove(b);
+                        //b.breakNaturally(new ItemStack(Material.DIAMOND_AXE));
+                        toBreak.add(b);
+                        //game.getPlacedBlocks().remove(b);
                     }
                 }
+            }
+            game.getPlacedBlocks().addAll(toBreak);
+            for (Block b : toBreak) {
+                b.breakNaturally(new ItemStack(Material.DIAMOND_AXE));
             }
         }
     }

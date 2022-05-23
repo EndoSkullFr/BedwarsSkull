@@ -1,5 +1,8 @@
 you: " §7TOI"
+upgrades-text: "Améliorations"
+cost: "Prix"
 bought-item: "§c§lBEDWARS §8» §aVous avez acheté §6%item% x%amount%"
+bought-upgrade: "§c§lBEDWARS §8» §a%player% vient d'acheter §6%upgrade%"
 cant-afford: "§cVous n'avez pas assez de ressources pour acheter ceci"
 shift-click: "§cShift-clique sur un item pour l'ajouter aux favoris"
 break-self-bed: "§cVous ne pouvez pas casser votre propre lit"
@@ -7,6 +10,12 @@ break-block: "§cVous ne pouvez pas casser ce bloc"
 heigh-limit: "§cHauteur maximale de contruction atteinte"
 cant-place-here: "§cVous ne pouvez pas poser de blocs ici"
 cant-chest: "§cVous ne pouvez pas ouvrir ce coffre car son équipe est encore en vie"
+goulag-close: "§c§lFermeture du Goulag"
+goulag-now: "§eEn cours"
+end-broadcast: "§7§m-----------------------------------------------------\n§r \n§7Victoire de l'équipe %team%\n§r \n§7Meilleurs joueurs:\n          §c1er: §7%first%\n          §62eme: §7%second%\n          §e3eme: §7%third%\n§r \n§7§m-----------------------------------------------------"
+anyone: "Personne"
+team-eliminate: "§c§lBEDWARS §8» §cL'équipe %team% §cvient d'être éliminé"
+magic-milk-end: "§eL'effet du lait magique s'est dissipé"
 
 default-item-lore: "§7Prix: %price%\n\n§7%desc%\n\n§aCliquez pour acheter\n§bShift-clique pour ajouter aux favoris"
 less-item-lore: "§7Prix: %price%\n\n§7%desc%\n\n§cRessources insuffisantes\n§bShift-clique pour ajouter aux favoris"
@@ -20,6 +29,15 @@ favorite-max-lore: "\n§aAmélioration maximum atteinte\n§bShift-clique pour re
 favorite-already: "\n§cVous posséder déjà cet item\n§bShift-clique pour retirer des favoris"
 favorite-already-best: "\n§cVous posséder un item de niveau supérieur\n§bShift-clique pour retirer des favoris"
 
+upgrades-less: "§cRessources insuffisantes"
+upgrades-buy: "§aCliquez pour acheter"
+upgrades-max: "§aNiveau maximum atteint"
+
+trap-max: "§cVous ne pouvez pas avoir plus de 3 pièges"
+trap-already: "§cVous possédez ce piège"
+
+trap-title: "§cUn piège vient d'être activé"
+
 favorite-replace: "\n§aCliquez pour remplacer"
 add-favorite: "§aCliquez pour mettre ici"
 
@@ -31,7 +49,7 @@ hypixel-already: "§cVous avez déjà tenter de récupérer vos favoris au cours
 bed-break: "\n§f§lLIT DÉTRUIT > {TeamColor}Lit {TeamName} §7vient d'être cassé par {PlayerColor}{PlayerName} §7!\n§r §r"
 bed-break-victim: "§f§lLIT DÉTRUIT > §7Votre lit vient d'être cassé par {PlayerColor}{PlayerName} §7!"
 bed-break-title: "§cLIT DÉTRUIT !"
-bed-break-subtitle: "§fVous ne pourrez plus respawn"
+bed-break-subtitle: "§eVous ne pourrez plus respawn"
 
 leave-bed: "§cQuitter"
 spectate-compass: "§eSe téléporter à un joueur"
@@ -46,6 +64,23 @@ diamonds: "§bDiamants"
 emerald: "§aÉmeraude"
 emeralds: "§aÉmeraudes"
 
+kill-messages:
+  VOID: "%player% §7est tombé dans le vide"
+  PLAYER: "%player% §7s'est fait tuer par %killer%"
+  PLAYER_VOID: "%player% §7s'est fait pousser dans le vide par %killer%"
+  FIREBALL: "%player% §7est mort d'une fireball de %killer%"
+  FIREBALL_VOID: "%player% §7s'est fait pousser dans le vide par une fireball de %killer%"
+  TNT: "%player% §7s'est fait exploser par une tnt de %killer%"
+  TNT_VOID: "%player% §7s'est fait pousser dans le vide par une tnt de %killer%"
+  GOLEM: "%player% §7s'est fait tuer par un golem de %killer%"
+  GOLEM_VOID: "%player% §7s'est fait pousser dans le vide par un golem de %killer%"
+  SILVERFISH: "%player% §7s'est fait tuer par un silverfish de %killer%"
+  SILVERFISH_VOID: "%player% §7s'est fait pousser dans le vide par un silverfish de %killer%"
+  ARROW: "%player% §7s'est fait tirer dessus par %killer%"
+  ARROW_VOID: "%player% §7s'est fait pousser dans le vide par une flèche de %killer%"
+  OTHER: "%player% §7est mort"
+
+
 categories:
   QUICK_BUY: "Favoris"
   BLOCKS: "Blocs"
@@ -55,6 +90,67 @@ categories:
   RANGED: "Arcs"
   POTIONS: "Potions"
   UTILITY: "Utilitaires"
+
+upgrades:
+  SHARPNESS:
+    name: "Épées tranchantes"
+    desc: "Votre équipe gagne de façon permanente l'enchantement Sharpness I sur toutes les épées"
+  PROTECTION:
+    desc: "Votre équipe gagne de façon permanente l'enchantement Protection sur toutes les armures"
+    1:
+      name: "Armure renforcée 1"
+      desc: "Protection I"
+    2:
+      name: "Armure renforcée 2"
+      desc: "Protection II"
+    3:
+      name: "Armure renforcée 3"
+      desc: "Protection III"
+    4:
+      name: "Armure renforcée 4"
+      desc: "Protection IV"
+  HASTE:
+    desc: "Tous les joueurs de l'équipe gagne l'effect Haste de façon permanente"
+    1:
+      name: "Mineur Maniaque 1"
+      desc: "Haste I"
+    2:
+      name: "Mineur Maniaque 2"
+      desc: "Haste II"
+  FORGE:
+    desc: "Améliorer la vitesse d'apparition des ressources sur votre île"
+    1:
+      name: "Forge en fer"
+      desc: "+50% de Ressources"
+    2:
+      name: "Forge en or"
+      desc: "+100% de Ressources"
+    3:
+      name: "Forge en émeraude"
+      desc: "Apparition d'émeraudes"
+    4:
+      name: "Forge en fusion"
+      desc: "+200% de Ressources"
+  HEAL:
+    name: "Station de soin"
+    desc: "Créer un champ contenant l'effet régénération autour de votre vase"
+  GOULAG:
+    name: "Enjeux décisifs"
+    desc: "Votre équipe disposera de l'enchantement Sharpness I lors du match à mort en fin de partie"
+
+traps:
+  ITS_A_TRAP:
+    name: "C'est un piège !"
+    desc: "Donne l'effet blindness et slowness aux attaquants pendants 8 secondes"
+  COUNTER:
+    name: "Piège de contre offensive"
+    desc: "Donne speed II et jump boost II à tous les alliés prochent de la base"
+  ALARM:
+    name: "Alarme"
+    desc: "Révèle les joueurs invisibles"
+  MINER_FATIGUE:
+    name: "Piège de mining fatigue"
+    desc: "Donne l'effet mining fatigue aux attaquants pendant 10 secondes"
 
 items:
   WOOL:
@@ -174,7 +270,7 @@ items:
   MILK:
     name: "Seau de lait"
     desc: "Permet de ne pas activer les effets des pièges ennemis pendant 30 secondes"
-  SPONG:
+  SPONGE:
     name: "Éponge"
     desc: "Permet de retirer de l'eau (ou de faire le ninja avec les particules)"
   POPUP_TOWER:
@@ -182,12 +278,24 @@ items:
     desc: "Les amateurs de chateau ne vont pas être dessus"
 
 events:
-  diamond2: "Diamants II"
-  emerald2: "Émeraudes II"
-  diamond3: "Diamants III"
-  emerald3: "Émeraudes III"
-  bedDestroy: "Fin des lits"
-  gameOver: "Fin"
+  diamond2:
+    name: "Diamants II"
+    broadcast: "§c§lBEDWARS §8» §eLes générateurs de §bDiamant §eont été amélioré au niveau §cII"
+  emerald2:
+    name: "Émeraudes II"
+    broadcast: "§c§lBEDWARS §8» §eLes générateurs d'§2Émeraude §eont été amélioré au niveau §cII"
+  diamond3:
+    name: "Diamants III"
+    broadcast: "§c§lBEDWARS §8» §eLes générateurs de §bDiamant §eont été amélioré au niveau §cIII"
+  emerald3:
+    name: "Émeraudes III"
+    broadcast: "§c§lBEDWARS §8» §eLes générateurs d'§2Émeraude §eont été amélioré au niveau §cIII"
+  bedDestroy:
+    name: "✘ Lits"
+    broadcast: "§c§lBEDWARS §8» §cTous les lits viennent d'être détruit"
+  gameOver:
+    name: "☠ Goulag"
+    broadcast: "§c§lBEDWARS §8» §cLe goulag final va commencer"
 board:
   waiting:
     - '§a§lBED WARS'
@@ -225,3 +333,13 @@ board:
     - '{teams}'
     - ''
     - '§emc.endoskull.fr'
+
+team:
+  red: Rouge
+  blue: Bleu
+  green: Vert
+  yellow: Jaune
+  aqua: Cyan
+  white: Blanc
+  pink: Rose
+  grey: Gris

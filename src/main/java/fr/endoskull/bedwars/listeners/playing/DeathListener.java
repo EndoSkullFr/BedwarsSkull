@@ -1,15 +1,22 @@
 package fr.endoskull.bedwars.listeners.playing;
 
 import fr.endoskull.bedwars.Main;
-import fr.endoskull.bedwars.utils.GameState;
-import fr.endoskull.bedwars.utils.GameUtils;
+import fr.endoskull.bedwars.utils.*;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
+import fr.endoskull.bedwars.utils.bedwars.BedwarsPlayer;
+import fr.endoskull.bedwars.utils.bedwars.LastHit;
 import fr.endoskull.bedwars.utils.bedwars.Team;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+
+import java.util.HashMap;
 
 public class DeathListener implements Listener {
     private Main main;
@@ -33,26 +40,78 @@ public class DeathListener implements Listener {
             victim.spigot().respawn();
             return;
         }
-        if (!game.getPlayers().containsKey(victim)) {
+        BedwarsPlayer bwVictim = game.getBwPlayerByUUID(victim.getUniqueId());
+        if (bwVictim.isRespawning() || bwVictim.isSpectator()) {
             victim.spigot().respawn();
             return;
         }
-        Team team = game.getPlayers().get(victim);
-        if (!team.isHasBed()) {
+        Team team = bwVictim.getTeam();
+        boolean finalKill = !team.isHasBed();
+        if (finalKill && game.isGoulagOpen()) {
             /**
              * todo handle goulag
              */
-            Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
-                victim.spigot().respawn();
-                game.getPlayers().remove(victim);
-                /**
-                 * todo check win
-                 * + faire une fonction removePlayer() qui contient le checkwin
-                 */
-                game.addSpectator(victim);
-            }, 3L);
+            System.out.println("goulag");
             return;
         }
-        game.addRespawning(victim);
+        LastHit lastHit = LastHit.getLastHit(victim);
+        DamageType damageType;
+        if (lastHit == null) {
+            damageType = DamageType.OTHER;
+        } else {
+            damageType = lastHit.getType();
+        }
+        Player killer = null;
+        BedwarsPlayer bwKiller = null;
+        if (lastHit != null && lastHit.getDamager() != null) {
+            killer = game.getPlayerByUUID(lastHit.getDamager());
+            bwKiller = game.getBwPlayerByUUID(lastHit.getDamager());
+        }
+        if (killer == null && damageType != DamageType.VOID && damageType != DamageType.OTHER) {
+            damageType = DamageType.OTHER;
+        }
+        HashMap<ShopItems.ShopMaterial, Integer> loots = new HashMap<>();
+        for (ShopItems.ShopMaterial value : ShopItems.ShopMaterial.values()) {
+            for (int i = 0; i < 36; i++) {
+                ItemStack it = victim.getInventory().getItem(i);
+                if (it == null) continue;
+                if (it.getType() == value.getType()) {
+                    if (loots.containsKey(value)) {
+                        loots.put(value, loots.get(value) + it.getAmount());
+                    } else {
+                        loots.put(value, it.getAmount());
+                    }
+                }
+            }
+        }
+        if (killer != null) {
+            for (ShopItems.ShopMaterial shopMaterial : loots.keySet()) {
+                killer.sendMessage(MessagesUtils.getMaterial(killer, shopMaterial, 1).substring(0, 2) + "+" + loots.get(shopMaterial) + " " + MessagesUtils.getMaterial(killer, shopMaterial, loots.get(shopMaterial)));
+                killer.getInventory().addItem(new ItemStack(shopMaterial.getType(), loots.get(shopMaterial)));
+            }
+        }
+        if (finalKill) {
+            Location loc;
+            if (killer == null) {
+                loc = game.getSpawns().get(bwVictim.getTeam()).getLocation(game.getWorld());
+            } else {
+                loc = game.getSpawns().get(bwKiller.getTeam()).getLocation(game.getWorld());
+            }
+            for (ItemStack content : victim.getEnderChest().getContents()) {
+                if (content == null) continue;
+                Item item = loc.getWorld().dropItem(loc, content);
+                item.setVelocity(new Vector(0, 0, 0));
+            }
+        }
+        for (Player p : game.getAllPlayers()) {
+            String message = MessagesUtils.getKillMessage(p, damageType).replace("%player%", bwVictim.getTeam().getColor().chat() + victim.getName());
+            if (killer != null) {
+                message = message.replace("%killer%", bwKiller.getTeam().getColor().chat() + killer.getName());
+            }
+            if (!team.isHasBed()) message += " §b§lFINAL KILL !";
+            p.sendMessage(message);
+        }
+        LastHit.getLastHit().remove(victim.getUniqueId());
+        bwVictim.addRespawning();
     }
 }

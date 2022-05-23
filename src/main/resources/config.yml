@@ -1,13 +1,15 @@
 goulag: true
+goulag-timer: 60
 
 generators:
+  emerald-at-base: 60
   iron:
     delay: 2
-    amount: 20
+    amount: 1
     spawn-limit: 40
   gold:
-    delay: 5
-    amount: 10
+    delay: 8
+    amount: 1
     spawn-limit: 7
   diamond:
     tierI:

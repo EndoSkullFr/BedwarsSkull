@@ -2,6 +2,7 @@ package fr.endoskull.bedwars.utils;
 
 import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
+import fr.endoskull.bedwars.utils.bedwars.BedwarsPlayer;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -34,14 +35,14 @@ public enum ShopItems {
     ARMOR3(new ItemStack(Material.DIAMOND_BOOTS), ShopCategories.ARMOR, Material.EMERALD, 6, false, true, "armor", 3, false, true, true),
 
     SHEARS(new ItemStack(Material.SHEARS), ShopCategories.TOOLS, Material.IRON_INGOT, 20, false, true, "", 1, false, false, true),
-    AXE1(new ItemStack(Material.WOOD_AXE), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, true, "axe", 1, true, false, true),
-    AXE2(new ItemStack(Material.STONE_AXE), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, false, "axe", 2, true, false, true),
-    AXE3(new ItemStack(Material.IRON_AXE), ShopCategories.TOOLS, Material.GOLD_INGOT, 3, false, false, "axe", 3, true, false, true),
-    AXE4(new ItemStack(Material.DIAMOND_AXE), ShopCategories.TOOLS, Material.GOLD_INGOT, 6, false, false, "axe", 4, true, false, true),
-    PICKAXE1(new ItemStack(Material.WOOD_PICKAXE), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, true, "pickaxe", 1, true, false, true),
-    PICKAXE2(new ItemStack(Material.IRON_PICKAXE), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, false, "pickaxe", 2, true, false, true),
-    PICKAXE3(new ItemStack(Material.GOLD_PICKAXE), ShopCategories.TOOLS, Material.GOLD_INGOT, 3, false, false, "pickaxe", 3, true, false, true),
-    PICKAXE4(new ItemStack(Material.DIAMOND_PICKAXE), ShopCategories.TOOLS, Material.GOLD_INGOT, 6, false, false, "pickaxe", 4, true, false, true),
+    AXE1(new CustomItemStack(Material.WOOD_AXE).addCustomEnchantment(Enchantment.DIG_SPEED, 1), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, true, "axe", 1, true, false, true),
+    AXE2(new CustomItemStack(Material.STONE_AXE).addCustomEnchantment(Enchantment.DIG_SPEED, 1), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, false, "axe", 2, true, false, true),
+    AXE3(new CustomItemStack(Material.IRON_AXE).addCustomEnchantment(Enchantment.DIG_SPEED, 2), ShopCategories.TOOLS, Material.GOLD_INGOT, 3, false, false, "axe", 3, true, false, true),
+    AXE4(new CustomItemStack(Material.DIAMOND_AXE).addCustomEnchantment(Enchantment.DIG_SPEED, 3), ShopCategories.TOOLS, Material.GOLD_INGOT, 6, false, false, "axe", 4, true, false, true),
+    PICKAXE1(new CustomItemStack(Material.WOOD_PICKAXE).addCustomEnchantment(Enchantment.DIG_SPEED,1), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, true, "pickaxe", 1, true, false, true),
+    PICKAXE2(new CustomItemStack(Material.IRON_PICKAXE).addCustomEnchantment(Enchantment.DIG_SPEED, 2), ShopCategories.TOOLS, Material.IRON_INGOT, 10, false, false, "pickaxe", 2, true, false, true),
+    PICKAXE3(new CustomItemStack(Material.GOLD_PICKAXE).addCustomEnchantment(Enchantment.DIG_SPEED, 3).addCustomEnchantment(Enchantment.DAMAGE_ALL, 2), ShopCategories.TOOLS, Material.GOLD_INGOT, 3, false, false, "pickaxe", 3, true, false, true),
+    PICKAXE4(new CustomItemStack(Material.DIAMOND_PICKAXE).addCustomEnchantment(Enchantment.DIG_SPEED, 3), ShopCategories.TOOLS, Material.GOLD_INGOT, 6, false, false, "pickaxe", 4, true, false, true),
 
     ARROW(new ItemStack(Material.ARROW, 6), ShopCategories.RANGED, Material.GOLD_INGOT, 4, false, false, "", 1, false, false, false),
     BOW1(new ItemStack(Material.BOW), ShopCategories.RANGED, Material.GOLD_INGOT, 12, false, false, "", 1, false, false, true),
@@ -61,7 +62,7 @@ public enum ShopItems {
     WATER_BUCKET(new CustomItemStack(Material.WATER_BUCKET), ShopCategories.UTILITY, Material.GOLD_INGOT, 3, false, false, "", 1, false, false, false),
     BRIDGE_EGG(new CustomItemStack(Material.EGG), ShopCategories.UTILITY, Material.EMERALD, 1, false, false, "", 1, false, false, false),
     MILK(new CustomItemStack(Material.MILK_BUCKET), ShopCategories.UTILITY, Material.GOLD_INGOT, 4, false, false, "", 1, false, false, false),
-    SPONG(new CustomItemStack(Material.SPONGE, 4), ShopCategories.UTILITY, Material.GOLD_INGOT, 3, false, false, "", 1, false, false, false),
+    SPONGE(new CustomItemStack(Material.SPONGE, 4), ShopCategories.UTILITY, Material.GOLD_INGOT, 3, false, false, "", 1, false, false, false),
     POPUP_TOWER(new CustomItemStack(Material.CHEST), ShopCategories.UTILITY, Material.IRON_INGOT, 24, false, false, "", 1, false, false, false),;
 
 
@@ -86,6 +87,21 @@ public enum ShopItems {
         put("golden_apple", GOLDEN_APPLE);
         put("diamond_boots", ARMOR3);
         put("ender_pearl", ENDER_PEARL);
+        put("blast-proof_glass", GLASS);
+        put("stone_sword", SWORD1);
+        put("chainmail_boots", ARMOR1);
+        put("bow", BOW1);
+        put("bow_(power_i)", BOW2);
+        put("bow_(power_i__punch_i)", BOW3);
+        put("speed_ii_potion_(45_seconds)", POTION_SPEED);
+        put("bedbug", BED_BUG);
+        put("sponge", SPONGE);
+        put("jump_v_potion_(45_seconds)", POTION_JUMP);
+        put("dream_defender", GOLEM);
+        put("bridge_egg", BRIDGE_EGG);
+        put("magic_milk", WATER_BUCKET);
+        put("obsidian", OBSIDIAN);
+        put("diamond_sword", SWORD3);
     }};
 
     public static int getMaxFamilyTier(String family) {
@@ -96,19 +112,19 @@ public enum ShopItems {
         }
         return tier;
     }
-    public static ShopItems getFromFamily(Player player, String family, int tier) {
+    public static ShopItems getFromFamily(BedwarsPlayer bwPlayer, String family, int tier) {
         return Arrays.stream(values()).filter(shopItems -> shopItems.getFamily().equalsIgnoreCase(family) && shopItems.getTier() == tier).findFirst().orElse(null);
     }
 
-    public static ShopItems getActualFamily(Player player, String family) {
-        return getFromFamily(player, family, GameUtils.getGame(player).getItemsTier().get(player).getUpgrades().getOrDefault(family, 1));
+    public static ShopItems getActualFamily(BedwarsPlayer bwPlayer, String family) {
+        return getFromFamily(bwPlayer, family, bwPlayer.getTierTool().getUpgrades().getOrDefault(family, 1));
     }
 
-    public static ShopItems getNextFromFamily(Player player, String family) {
-        if (GameUtils.getGame(player).getItemsTier().get(player).getUpgrades().containsKey(family)) {
-            return getFromFamily(player, family, GameUtils.getGame(player).getItemsTier().get(player).getUpgrades().get(family) + 1);
+    public static ShopItems getNextFromFamily(BedwarsPlayer bwPlayer, String family) {
+        if (bwPlayer.getTierTool().getUpgrades().containsKey(family)) {
+            return getFromFamily(bwPlayer, family, bwPlayer.getTierTool().getUpgrades().get(family) + 1);
         } else {
-            return getFromFamily(player, family, 1);
+            return getFromFamily(bwPlayer, family, 1);
         }
     }
 
@@ -194,8 +210,9 @@ public enum ShopItems {
         ItemStack it = item.clone();
         if (colorable) {
             for (Arena game : Main.getInstance().getGames()) {
-                if (game.getPlayers().containsKey(player)) {
-                    it.setDurability(game.getPlayers().get(player).getColor().dye().getWoolData());
+                BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(player.getUniqueId());
+                if (bwPlayer != null) {
+                    it.setDurability(bwPlayer.getTeam().getColor().dye().getWoolData());
                 }
             }
         }

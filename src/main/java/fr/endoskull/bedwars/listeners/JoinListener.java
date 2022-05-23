@@ -23,10 +23,12 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        FavoritesUtils.initFavorites(player);
+        FavoritesUtils.loadFavorites(player);
         Arena game = MapManager.findAvaibleGame(1);
         FastBoard board = new FastBoard(player);
         main.getBoards().add(board);
+        player.setScoreboard(main.getScoreboard());
+        main.getScoreboard().getTeam("default").addPlayer(player);
         if (game != null) {
             game.addPlayer(player);
         } else {
@@ -39,6 +41,7 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
         Player player = e.getPlayer();
+        FavoritesUtils.saveFavorites(player);
         for (FastBoard board : new ArrayList<>(main.getBoards())) {
             if (board.getPlayer().equals(player)) {
                 main.getBoards().remove(board);

@@ -19,7 +19,7 @@ public class TowerSouth {
 
   public TowerSouth(Location loc, Block chest, DyeColor color, Player p) {
     ItemStack itemInHand = p.getInventory().getItemInHand();
-    NmsUtils.minusAmount(p, itemInHand, 1);
+    NmsUtils.minusHand(p);
     List<String> relloc = new ArrayList<>();
     relloc.add("1, 0, 2");
     relloc.add("2, 0, 1");

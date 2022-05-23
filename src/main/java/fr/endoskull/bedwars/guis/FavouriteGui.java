@@ -1,6 +1,7 @@
 package fr.endoskull.bedwars.guis;
 
 import fr.endoskull.bedwars.utils.*;
+import fr.endoskull.bedwars.utils.bedwars.BedwarsPlayer;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -37,7 +38,8 @@ public class FavouriteGui extends CustomGui {
         if (item.getFamily().equalsIgnoreCase("") || !item.isStackFamily()) {
             FavoritesUtils.getFavorites(player).put(slot, item);
         } else {
-            FavoritesUtils.getFavorites(player).put(slot, ShopItems.getFromFamily(player, item.getFamily(), 1));
+            BedwarsPlayer bwPlayer = GameUtils.getGame(player).getBwPlayerByUUID(player.getUniqueId());
+            FavoritesUtils.getFavorites(player).put(slot, ShopItems.getFromFamily(bwPlayer, item.getFamily(), 1));
         }
     }
 }

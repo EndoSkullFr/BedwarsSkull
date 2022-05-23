@@ -24,6 +24,7 @@ import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.listeners.playing.EggListener;
 import fr.endoskull.bedwars.utils.GameUtils;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
+import fr.endoskull.bedwars.utils.bedwars.BedwarsPlayer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Egg;
@@ -70,8 +71,11 @@ public class EggBridgeTask implements Runnable {
 
         Location loc = getProjectile().getLocation();
 
+        BedwarsPlayer bwPlayer = arena.getBwPlayerByUUID(player.getUniqueId());
         if (getProjectile().isDead()
-                || !arena.getPlayers().containsKey(getPlayer())
+                || bwPlayer == null
+                || bwPlayer.isSpectator()
+                || bwPlayer.isRespawning()
                 || getPlayer().getLocation().distance(getProjectile().getLocation()) > 27
                 || getPlayer().getLocation().getY() - getProjectile().getLocation().getY() > 9) {
             EggListener.removeEgg(projectile);

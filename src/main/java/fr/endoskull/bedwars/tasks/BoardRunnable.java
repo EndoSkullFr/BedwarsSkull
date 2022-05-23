@@ -3,6 +3,7 @@ package fr.endoskull.bedwars.tasks;
 import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.board.FastBoard;
 import fr.endoskull.bedwars.utils.BoardConfig;
+import fr.endoskull.bedwars.utils.GameEvent;
 import fr.endoskull.bedwars.utils.GameState;
 import fr.endoskull.bedwars.utils.MessagesUtils;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
@@ -28,7 +29,7 @@ public class BoardRunnable extends BukkitRunnable {
             Player player = board.getPlayer();
             if (player == null) continue;
             for (Arena game : main.getGames()) {
-                if (game.getPlayers().containsKey(player)) {
+                if (game.getAllPlayers().contains(player)) {
                     if (game.getGameState() == GameState.waiting) {
                         List<String> lines = new ArrayList<>();
                         for (String s : BoardConfig.getWaitingLines()) {
@@ -63,7 +64,8 @@ public class BoardRunnable extends BukkitRunnable {
                                     .replace("{on}", String.valueOf(game.getPlayers().size()))
                                     .replace("{max}", String.valueOf(game.getTeams().size() * game.getMaxTeamSize()))
                                     .replace("{time}", getText(game.getEventTimer()))
-                                    .replace("{nextEvent}", MessagesUtils.getEventDisplayname(player, game.getGameEvent())));
+                                    .replace("{nextEvent}", MessagesUtils.getEventDisplayname(player, game.getGameEvent()))
+                                    .replace("{goulag}", getGoulag(game, player)));
                         }
                         board.updateTitle(BoardConfig.getPlayingTitle());
                         int i = 0;
@@ -81,7 +83,18 @@ public class BoardRunnable extends BukkitRunnable {
         }
     }
 
+    private String getGoulag(Arena game, Player player) {
+        if (game.getGameEvent() == GameEvent.gameOver && game.getEventTimer() == 0) {
+            return MessagesUtils.GOULAG_NOW.getMessage(player);
+        }
+        if (!game.isGoulagOpen()) {
+            return "§c✘";
+        }
+        return "§a" + game.getGoulagTimer();
+    }
+
     private String getText(int time) {
+        if (time < 0) time = 0;
         int minute = 0;
         while (time >= 60) {
             minute++;

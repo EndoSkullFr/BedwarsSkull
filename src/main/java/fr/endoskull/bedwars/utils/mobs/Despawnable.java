@@ -24,6 +24,7 @@ import fr.endoskull.bedwars.utils.bedwars.Arena;
 import fr.endoskull.bedwars.utils.bedwars.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,13 +39,15 @@ public class Despawnable {
     private int despawn = 250;
     private String name;
     private UUID uuid;
+    private Player player;
 
-    public Despawnable(LivingEntity e, Team team, Arena arena, int despawn, String name) {
+    public Despawnable(LivingEntity e, Team team, Arena arena, int despawn, String name, Player player) {
         this.e = e;
         if (e == null) return;
         this.uuid = e.getUniqueId();
         this.team = team;
         this.arena = arena;
+        this.player = player;
         if (despawn != 0) {
             this.despawn = despawn;
         }
@@ -108,5 +111,9 @@ public class Despawnable {
     public boolean equals(Object obj) {
         if (obj instanceof LivingEntity) return ((LivingEntity) obj).getUniqueId().equals(e.getUniqueId());
         return false;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 }

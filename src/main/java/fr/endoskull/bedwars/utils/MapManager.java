@@ -25,43 +25,42 @@ public class MapManager {
     public static void loadArena(String name) {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(Main.getInstance().getDataFolder(), name + ".yml"));
         Arena arena = new Arena();
-        arena.setName(config.getString("name"));
-        Bukkit.createWorld(new WorldCreator(config.getString("world")));
-        arena.setWorld(Bukkit.getWorld(config.getString("world")));
-        arena.setBorderSize(config.getInt("boarderSize"));
-        arena.setLobby(new BedwarsLocation(config.getString("lobby").split(":")));
-        arena.setCorner1(new BedwarsLocation(config.getString("corner1").split(":")));
-        arena.setCorner2(new BedwarsLocation(config.getString("corner2").split(":")));
-        arena.setSpawnProtection(config.getInt("spawnProtection"));
+        arena.setName(config.getString("display-name"));
+        Bukkit.createWorld(new WorldCreator(name));
+        arena.setWorld(Bukkit.getWorld(name));
+        arena.setBorderSize(config.getInt("worldBorder"));
+        arena.setLobby(new BedwarsLocation(config.getString("waiting.Loc").split(",")));
+        arena.getWorld().setSpawnLocation((int) Math.round(arena.getLobby().getX()), (int) Math.round(arena.getLobby().getY()), (int) Math.round(arena.getLobby().getZ()));
+        arena.setCorner1(new BedwarsLocation(config.getString("waiting.Pos1").split(",")));
+        arena.setCorner2(new BedwarsLocation(config.getString("waiting.Pos2").split(",")));
+        arena.setGoulagSpawn1(new BedwarsLocation(config.getString("goulag.Spawn1").split(",")));
+        arena.setGoulagSpawn2(new BedwarsLocation(config.getString("goulag.Spawn2").split(",")));
+        arena.setGoulagLoc1(new BedwarsLocation(config.getString("goulag.Loc1").split(",")));
+        arena.setGoulagLoc2(new BedwarsLocation(config.getString("goulag.Loc2").split(",")));
+        arena.setSpawnProtection(config.getInt("spawn-protection"));
         arena.setBaseRadius(config.getInt("baseRadius"));
-        arena.setHeightLimit(config.getInt("heightLimit"));
-        arena.setMaxTeamSize(config.getInt("maxTeamSize"));
-        arena.setMin(config.getInt("min"));
-        for (String s : config.getConfigurationSection("teams").getKeys(false)) {
-            Team team = new Team(s, config.getString("teams." + s + ".name"), TeamColor.valueOf(config.getString("teams." + s + ".color")));
+        arena.setHeightLimit(config.getInt("max-build-y"));
+        arena.setMaxTeamSize(config.getInt("maxInTeam"));
+        arena.setMin(config.getInt("minPlayers"));
+        for (String s : config.getStringList("game-rules")) {
+            arena.getWorld().setGameRuleValue(s.split(":")[0], s.split(":")[1]);
+        }
+        for (String s : config.getConfigurationSection("Team").getKeys(false)) {
+            Team team = new Team(s, TeamColor.valueOf(config.getString("Team." + s + ".Color")));
             arena.getTeams().add(team);
+            arena.getSpawns().put(team, new BedwarsLocation(config.getString("Team." + s + ".Spawn").split(",")));
+            arena.getBeds().put(team, new BedwarsLocation(config.getString("Team." + s + ".Bed").split(",")));
+            arena.getGenerators().put(team, new BedwarsLocation(config.getStringList("Team." + s + ".Iron").get(0).split(",")));
+            arena.getShops().put(team, new BedwarsLocation(config.getString("Team." + s + ".Shop").split(",")));
+            arena.getUpgrades().put(team, new BedwarsLocation(config.getString("Team." + s + ".Upgrade").split(",")));
         }
-        for (String s : config.getConfigurationSection("spawns").getKeys(false)) {
-            arena.getSpawns().put(arena.getTeamByName(s), new BedwarsLocation(config.getString("spawns." + s).split(":")));
+        for (String s : config.getStringList("generator.Emerald")) {
+            arena.getEmeraldGenerators().add(new BedwarsLocation(s.split(",")));
         }
-        for (String s : config.getConfigurationSection("generators").getKeys(false)) {
-            arena.getGenerators().put(arena.getTeamByName(s), new BedwarsLocation(config.getString("generators." + s).split(":")));
+        for (String s : config.getStringList("generator.Diamond")) {
+            arena.getDiamondGenerators().add(new BedwarsLocation(s.split(",")));
         }
-        for (String s : config.getConfigurationSection("shops").getKeys(false)) {
-            arena.getShops().put(arena.getTeamByName(s), new BedwarsLocation(config.getString("shops." + s).split(":")));
-        }
-        for (String s : config.getConfigurationSection("upgrades").getKeys(false)) {
-            arena.getUpgrades().put(arena.getTeamByName(s), new BedwarsLocation(config.getString("upgrades." + s).split(":")));
-        }
-        for (String s : config.getStringList("emeraldGenerators")) {
-            arena.getEmeraldGenerators().add(new BedwarsLocation(s.split(":")));
-        }
-        for (String s : config.getStringList("diamondGenerators")) {
-            arena.getDiamondGenerators().add(new BedwarsLocation(s.split(":")));
-        }
-        for (String s : config.getConfigurationSection("beds").getKeys(false)) {
-            arena.getBeds().put(arena.getTeamByName(s), new BedwarsLocation(config.getString("beds." + s).split(":")));
-        }
+        arena.setGoulagTimer(ConfigUtils.getGoulagTimer());
 
         Main.getInstance().getGames().add(arena);
     }

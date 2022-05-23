@@ -3,6 +3,7 @@ package fr.endoskull.bedwars.guis;
 import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.utils.*;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
+import fr.endoskull.bedwars.utils.bedwars.BedwarsPlayer;
 import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -27,6 +28,7 @@ public class ShopGui extends CustomGui {
         super(6, MessagesUtils.getCategoryName(p, category));
         Arena game = GameUtils.getGame(p);
         if (game == null) return;
+        BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(p.getUniqueId());
         int i = 0;
         for (ShopCategories value : ShopCategories.values()) {
             setItem(i, new CustomItemStack(value.getItem()).setName("§a" + MessagesUtils.getCategoryName(p, value)), player -> {
@@ -94,15 +96,15 @@ public class ShopGui extends CustomGui {
                 if (FavoritesUtils.getFavorites(p).containsKey(slot)) {
                     ShopItems value = FavoritesUtils.getFavorites(p).get(slot);
                     if (!value.getFamily().equalsIgnoreCase("") && value.isStackFamily()) {
-                        if (game.getItemsTier().get(p).getUpgrades().containsKey(value.getFamily()) && ShopItems.getMaxFamilyTier(value.getFamily()) <= game.getItemsTier().get(p).getUpgrades().get(value.getFamily())) {
-                            value = ShopItems.getFromFamily(p, value.getFamily(), ShopItems.getMaxFamilyTier(value.getFamily()));
-                        } else if (game.getItemsTier().get(p).getUpgrades().containsKey(value.getFamily())) {
-                            value = ShopItems.getNextFromFamily(p, value.getFamily());
+                        if (bwPlayer.getTierTool().getUpgrades().containsKey(value.getFamily()) && ShopItems.getMaxFamilyTier(value.getFamily()) <= bwPlayer.getTierTool().getUpgrades().get(value.getFamily())) {
+                            value = ShopItems.getFromFamily(bwPlayer, value.getFamily(), ShopItems.getMaxFamilyTier(value.getFamily()));
+                        } else if (bwPlayer.getTierTool().getUpgrades().containsKey(value.getFamily())) {
+                            value = ShopItems.getNextFromFamily(bwPlayer, value.getFamily());
                         }
                     }
-                    CustomItemStack customItemStack = getItem(p, value, true, game);
+                    CustomItemStack customItemStack = getItem(p, value, true, game, bwPlayer);
                     if (customItemStack == null) continue;
-                    setItem(slot, customItemStack, getAction(p, value, true, game, category, slot));
+                    setItem(slot, customItemStack, getAction(p, value, true, game, category, slot, bwPlayer));
                 } else {
                     setItem(slot, new CustomItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14).setName(MessagesUtils.SHIFT_CLICK.getMessage(p)));
                 }
@@ -111,15 +113,15 @@ public class ShopGui extends CustomGui {
         }
         for (ShopItems value : ShopItems.values()) {
             if (value.getCategory() == category) {
-                CustomItemStack customItemStack = getItem(p, value, false, game);
+                CustomItemStack customItemStack = getItem(p, value, false, game, bwPlayer);
                 if (customItemStack == null) continue;
-                setItem(itemsSlot[i], customItemStack, getAction(p, value, false, game, category, itemsSlot[i]));
+                setItem(itemsSlot[i], customItemStack, getAction(p, value, false, game, category, itemsSlot[i], bwPlayer));
                 i++;
             }
         }
     }
 
-    private CustomGuiSuperAction getAction(Player p, ShopItems value, boolean favorite, Arena game, ShopCategories category, int slot) {
+    private CustomGuiSuperAction getAction(Player p, ShopItems value, boolean favorite, Arena game, ShopCategories category, int slot, BedwarsPlayer bwPlayer) {
         return (player, clickType) -> {
             if (clickType.isShiftClick()) {
                 if (favorite) {
@@ -134,28 +136,28 @@ public class ShopGui extends CustomGui {
             if (!value.getFamily().equalsIgnoreCase("")) {
                 if (value.isStackFamily()) {
                     if (!value.getFamily().equalsIgnoreCase("")) {
-                        if (game.getItemsTier().get(player).getUpgrades().containsKey(value.getFamily()) && ShopItems.getMaxFamilyTier(value.getFamily()) <= game.getItemsTier().get(player).getUpgrades().get(value.getFamily())) {
-                            if (ShopItems.getFromFamily(player, value.getFamily(), ShopItems.getMaxFamilyTier(value.getFamily())).getTier() == value.getTier()) {
+                        if (bwPlayer.getTierTool().getUpgrades().containsKey(value.getFamily()) && ShopItems.getMaxFamilyTier(value.getFamily()) <= bwPlayer.getTierTool().getUpgrades().get(value.getFamily())) {
+                            if (ShopItems.getFromFamily(bwPlayer, value.getFamily(), ShopItems.getMaxFamilyTier(value.getFamily())).getTier() == value.getTier()) {
                                 buyAction = false;
                             }
                         }
                     }
                 } else {
-                    if (value.isPermanent() && game.getAlreadyBought().get(player).contains(value)) {
+                    if (value.isPermanent() && bwPlayer.getAlreadyBought().contains(value)) {
                         buyAction = false;
-                    } else if (game.getItemsTier().get(player).getUpgrades().containsKey(value.getFamily()) && game.getItemsTier().get(player).getUpgrades().get(value.getFamily()) > value.getTier()) {
+                    } else if (bwPlayer.getTierTool().getUpgrades().containsKey(value.getFamily()) && bwPlayer.getTierTool().getUpgrades().get(value.getFamily()) > value.getTier()) {
                         buyAction = false;
                     }
                 }
             }
-            if (value.isPermanent() && game.getAlreadyBought().get(player).contains(value)) {
+            if (value.isPermanent() && bwPlayer.getAlreadyBought().contains(value)) {
                 buyAction = false;
             }
             if (!buyAction) return;
             if (hasMaterial(p, value.getCost(), value.getAmount())) {
                 clear(p, value.getCost(), value.getAmount());
                 if (value.isPermanent()) {
-                    game.getAlreadyBought().get(player).add(value);
+                    bwPlayer.getAlreadyBought().add(value);
                 }
                 if (value.getItem(player).getType().toString().contains("SWORD")) {
                     player.getInventory().remove(Material.WOOD_SWORD);
@@ -163,20 +165,24 @@ public class ShopGui extends CustomGui {
                 if (value.getFamily().equalsIgnoreCase("")) {
                     if (value.isArmor()) {
                         value.giveArmor(player);
+                        bwPlayer.checkUpgrades();
                     } else {
                         player.getInventory().addItem(value.getItem(player));
+                        bwPlayer.checkUpgrades();
                     }
                 } else {
                     if (value.getTier() == 1 || value.isArmor()) {
                         if (value.isArmor()) {
                             value.giveArmor(player);
+                            bwPlayer.checkUpgrades();
                         } else {
                             player.getInventory().addItem(value.getItem(player));
+                            bwPlayer.checkUpgrades();
                         }
                     } else {
-                        replace(player, ShopItems.getActualFamily(player, value.getFamily()).getItem(player), value.getItem(player));
+                        replace(player, ShopItems.getActualFamily(bwPlayer, value.getFamily()).getItem(player), value.getItem(player));
                     }
-                    game.getItemsTier().get(player).getUpgrades().put(value.getFamily(), value.getTier());
+                    bwPlayer.getTierTool().getUpgrades().put(value.getFamily(), value.getTier());
                 }
                 player.sendMessage(MessagesUtils.BOUGHT_ITEM.getMessage(player).replace("%item%", MessagesUtils.getItemName(player, value)).replace("%amount%", String.valueOf(value.getItem(player).getAmount())));
                 player.playSound(player.getLocation(), Sound.VILLAGER_YES, 1f, 1f);
@@ -188,35 +194,35 @@ public class ShopGui extends CustomGui {
         };
     }
 
-    private CustomItemStack getItem(Player player, ShopItems value, boolean favorite, Arena game) {
+    private CustomItemStack getItem(Player player, ShopItems value, boolean favorite, Arena game, BedwarsPlayer bwPlayer) {
         if (!value.getFamily().equalsIgnoreCase("")) {
             if (value.isStackFamily()) {
                 if (!value.getFamily().equalsIgnoreCase("")) {
-                    if (game.getItemsTier().get(player).getUpgrades().containsKey(value.getFamily()) && ShopItems.getMaxFamilyTier(value.getFamily()) <= game.getItemsTier().get(player).getUpgrades().get(value.getFamily())) {
-                        if (ShopItems.getFromFamily(player, value.getFamily(), ShopItems.getMaxFamilyTier(value.getFamily())).getTier() == value.getTier()) {
+                    if (bwPlayer.getTierTool().getUpgrades().containsKey(value.getFamily()) && ShopItems.getMaxFamilyTier(value.getFamily()) <= bwPlayer.getTierTool().getUpgrades().get(value.getFamily())) {
+                        if (ShopItems.getFromFamily(bwPlayer, value.getFamily(), ShopItems.getMaxFamilyTier(value.getFamily())).getTier() == value.getTier()) {
                             return new CustomItemStack(value.getItem(player))
                                     .setName("§a"+ MessagesUtils.getItemName(player, value))
                                     .setLore((favorite ? MessagesUtils.FAVORITE_MAX_LORE : MessagesUtils.MAX_ITEM_LORE).getMessage(player));
                         } else {
                             return null;
                         }
-                    } else if (!ShopItems.getNextFromFamily(player, value.getFamily()).equals(value)) {
+                    } else if (!ShopItems.getNextFromFamily(bwPlayer, value.getFamily()).equals(value)) {
                         return null;
                     }
                 }
             } else {
-                if (value.isPermanent() && game.getAlreadyBought().get(player).contains(value)) {
+                if (value.isPermanent() && bwPlayer.getAlreadyBought().contains(value)) {
                     return new CustomItemStack(value.getItem(player))
                             .setName("§c"+ MessagesUtils.getItemName(player, value))
                             .setLore((favorite ? MessagesUtils.FAVORITE_ALREADY : MessagesUtils.ITEM_ALREADY_LORE).getMessage(player));
-                } else if (game.getItemsTier().get(player).getUpgrades().containsKey(value.getFamily()) && game.getItemsTier().get(player).getUpgrades().get(value.getFamily()) > value.getTier()) {
+                } else if (bwPlayer.getTierTool().getUpgrades().containsKey(value.getFamily()) && bwPlayer.getTierTool().getUpgrades().get(value.getFamily()) > value.getTier()) {
                     return new CustomItemStack(value.getItem(player))
                             .setName("§c"+ MessagesUtils.getItemName(player, value))
                             .setLore((favorite ? MessagesUtils.FAVORITE_ALREADY_BEST : MessagesUtils.ITEM_ALREADY_BEST_LORE).getMessage(player));
                 }
             }
         }
-        if (value.isPermanent() && game.getAlreadyBought().get(player).contains(value)) {
+        if (value.isPermanent() && bwPlayer.getAlreadyBought().contains(value)) {
             return new CustomItemStack(value.getItem(player))
                     .setName("§c" + MessagesUtils.getItemName(player, value))
                     .setLore((favorite ? MessagesUtils.FAVORITE_ALREADY : MessagesUtils.ITEM_ALREADY_LORE).getMessage(player));
