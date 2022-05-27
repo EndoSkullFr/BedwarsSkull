@@ -1,5 +1,5 @@
 goulag: true
-goulag-timer: 60
+goulag-timer: 600
 
 generators:
   emerald-at-base: 60

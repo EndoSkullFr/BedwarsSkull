@@ -1,9 +1,11 @@
 package fr.endoskull.bedwars.utils.bedwars;
 
 import fr.endoskull.api.commons.EndoSkullAPI;
+import fr.endoskull.api.spigot.utils.CustomItemStack;
 import fr.endoskull.api.spigot.utils.Hologram;
 import fr.endoskull.api.spigot.utils.Title;
 import fr.endoskull.bedwars.Main;
+import fr.endoskull.bedwars.tasks.GoulagTask;
 import fr.endoskull.bedwars.tasks.RespawnTask;
 import fr.endoskull.bedwars.utils.*;
 import org.bukkit.*;
@@ -61,9 +63,13 @@ public class Arena {
     private final List<Item> splitItems = new ArrayList<>();
     private final List<UUID> alreadyHypixel = new ArrayList<>();
     private final List<ShopItems.ShopMaterial> genRest = new ArrayList<>();
+    private final List<BedwarsPlayer> waitingGoulag = new ArrayList<>();
+    private final List<BedwarsPlayer> inGoulag = new ArrayList<>();
 
     private int goulagTimer;
     private boolean goulagOpen = true;
+    private boolean goulaging = false;
+    private GoulagTask goulagTask;
 
     public Arena() {}
 
@@ -222,7 +228,7 @@ public class Arena {
 
     public Team getTeamByName(String name) {
         for (Team team : teams) {
-            if (team.getName().equalsIgnoreCase(name)) return team;
+            if (team.getColor().toString().equalsIgnoreCase(name)) return team;
         }
         return null;
     }
@@ -380,6 +386,7 @@ public class Arena {
             player.sendMessage("");
             player.sendMessage(MessagesUtils.GOULAG_CLOSE.getMessage(player));
             player.sendMessage("");
+            player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 1f, 1f);
         }
         /**
          * todo check players in goulag
@@ -721,5 +728,65 @@ public class Arena {
             }
         }
 
+    }
+
+    public List<BedwarsPlayer> getWaitingGoulag() {
+        return waitingGoulag;
+    }
+
+    public void sendToGoulag(BedwarsPlayer bwPlayer) {
+        Player player = bwPlayer.getPlayer();
+        if (player == null) return;
+        if (goulaging) {
+            // TODO: goulag already
+            return;
+        }
+        player.setMaxHealth(20);
+        player.setHealth(20);
+        player.setFoodLevel(20);
+        player.setLevel(0);
+        player.setExp(0);
+        player.setFlying(false);
+        player.setAllowFlight(false);
+        player.setFallDistance(0);
+        player.getInventory().setHeldItemSlot(0);
+        for (PotionEffect potionEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(potionEffect.getType());
+        }
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(new ItemStack[4]);
+        player.getInventory().setChestplate(new CustomItemStack(Material.LEATHER_CHESTPLATE).setLeatherColor(bwPlayer.getTeam().getColor().bukkitColor()).setUnbreakable());
+        player.getInventory().addItem(new CustomItemStack(Material.WOOD_AXE).setUnbreakable());
+        if (inGoulag.isEmpty()) {
+            player.teleport(goulagSpawn1.getLocation(world));
+        } else {
+            player.teleport(goulagSpawn2.getLocation(world));
+        }
+        inGoulag.add(bwPlayer);
+        if (inGoulag.size() == 2) {
+            startGoulag();
+        }
+
+    }
+
+    private void startGoulag() {
+        goulaging = true;
+        goulagTask = new GoulagTask(this);
+    }
+
+    public boolean isGoulaging() {
+        return goulaging;
+    }
+
+    public void setGoulaging(boolean goulaging) {
+        this.goulaging = goulaging;
+    }
+
+    public List<BedwarsPlayer> getInGoulag() {
+        return inGoulag;
+    }
+
+    public GoulagTask getGoulagTask() {
+        return goulagTask;
     }
 }

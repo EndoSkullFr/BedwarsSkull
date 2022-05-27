@@ -39,7 +39,7 @@ public class UpgradesGui extends CustomGui {
                             bwMember.checkUpgrades();
                             Player teamMember = bwMember.getPlayer();
                             if (teamMember == null) continue;
-                            teamMember.sendMessage(MessagesUtils.BOUGHT_UPGRADE.getMessage(teamMember).replace("%player%", player.getName()).replace("%upgrade%", MessagesUtils.getUpgradeName(player, value, tier)));
+                            teamMember.sendMessage(MessagesUtils.BOUGHT_UPGRADE.getMessage(teamMember).replace("%player%", player.getDisplayName()).replace("%upgrade%", MessagesUtils.getUpgradeName(player, value, tier)));
                         }
                         player.playSound(player.getLocation(), Sound.VILLAGER_YES, 1f, 1f);
                     } else {
@@ -74,7 +74,7 @@ public class UpgradesGui extends CustomGui {
                         bwMember.checkUpgrades();
                         Player teamMember = bwMember.getPlayer();
                         if (teamMember == null) continue;
-                        teamMember.sendMessage(MessagesUtils.BOUGHT_UPGRADE.getMessage(teamMember).replace("%player%", player.getName()).replace("%upgrade%", MessagesUtils.getTrapName(player, value)));
+                        teamMember.sendMessage(MessagesUtils.BOUGHT_UPGRADE.getMessage(teamMember).replace("%player%", player.getDisplayName()).replace("%upgrade%", MessagesUtils.getTrapName(player, value)));
                     }
                     player.playSound(player.getLocation(), Sound.VILLAGER_YES, 1f, 1f);
                 } else {

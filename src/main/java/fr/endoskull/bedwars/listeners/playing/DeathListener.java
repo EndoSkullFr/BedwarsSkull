@@ -47,13 +47,6 @@ public class DeathListener implements Listener {
         }
         Team team = bwVictim.getTeam();
         boolean finalKill = !team.isHasBed();
-        if (finalKill && game.isGoulagOpen()) {
-            /**
-             * todo handle goulag
-             */
-            System.out.println("goulag");
-            return;
-        }
         LastHit lastHit = LastHit.getLastHit(victim);
         DamageType damageType;
         if (lastHit == null) {
@@ -112,6 +105,13 @@ public class DeathListener implements Listener {
             p.sendMessage(message);
         }
         LastHit.getLastHit().remove(victim.getUniqueId());
+        if (finalKill && game.isGoulagOpen()) {
+            Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
+                victim.spigot().respawn();
+                game.sendToGoulag(bwVictim);
+            }, 3L);
+            return;
+        }
         bwVictim.addRespawning();
     }
 }
