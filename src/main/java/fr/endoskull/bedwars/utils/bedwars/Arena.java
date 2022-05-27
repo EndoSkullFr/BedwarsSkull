@@ -706,39 +706,42 @@ public class Arena {
                 if (best != null) bestPlayers.add(best);
             }*/
 
-            for (Player pls : getAllPlayers()) {
-                pls.setAllowFlight(true);
-                pls.setFlying(true);
-                InventoryUtils.setSpectateInv(pls, true);
-                for (PotionEffect potionEffect : pls.getActivePotionEffects()) {
-                    pls.removePotionEffect(potionEffect.getType());
+            Team finalLastTeam = lastTeam;
+            Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
+                for (Player pls : getAllPlayers()) {
+                    pls.setAllowFlight(true);
+                    pls.setFlying(true);
+                    InventoryUtils.setSpectateInv(pls, true);
+                    for (PotionEffect potionEffect : pls.getActivePotionEffects()) {
+                        pls.removePotionEffect(potionEffect.getType());
+                    }
+                    pls.playSound(pls.getLocation(), Sound.ENDERDRAGON_WINGS, 1, 1);
+                    pls.playSound(pls.getLocation(), Sound.ENDERDRAGON_GROWL, 1, 1);
+                    String message = MessagesUtils.END_BROADCAST.getMessage(pls);
+                    winner = finalLastTeam;
+                    if (finalLastTeam == null) {
+                        message = message.replace("%team%", MessagesUtils.ANYONE.getMessage(pls));
+                    } else {
+                        message = message.replace("%team%", finalLastTeam.getColor().chat() + MessagesUtils.getTeamDisplayName(pls, finalLastTeam.getName()));
+                    }
+                    if (bestPlayers.size() >= 1) {
+                        message = message.replace("%first%", EndoSkullAPI.getPrefix(bestPlayers.get(0).getUuid()) + bestPlayers.get(0).getName() + " §8- §7" + bestPlayers.get(0).getKill());
+                    } else {
+                        message = message.replace("%first%", MessagesUtils.ANYONE.getMessage(pls));
+                    }
+                    if (bestPlayers.size() >= 2) {
+                        message = message.replace("%second%", EndoSkullAPI.getPrefix(bestPlayers.get(1).getUuid()) + bestPlayers.get(1).getName() + " §8- §7" + bestPlayers.get(1).getKill());
+                    } else {
+                        message = message.replace("%second%", MessagesUtils.ANYONE.getMessage(pls));
+                    }
+                    if (bestPlayers.size() >= 3) {
+                        message = message.replace("%third%", EndoSkullAPI.getPrefix(bestPlayers.get(2).getUuid()) + bestPlayers.get(2).getName() + " §8- §7" + bestPlayers.get(2).getKill());
+                    } else {
+                        message = message.replace("%third%", MessagesUtils.ANYONE.getMessage(pls));
+                    }
+                    pls.sendMessage(message);
                 }
-                pls.playSound(pls.getLocation(), Sound.ENDERDRAGON_WINGS, 1, 1);
-                pls.playSound(pls.getLocation(), Sound.ENDERDRAGON_GROWL, 1, 1);
-                String message = MessagesUtils.END_BROADCAST.getMessage(pls);
-                winner = lastTeam;
-                if (lastTeam == null) {
-                    message = message.replace("%team%", MessagesUtils.ANYONE.getMessage(pls));
-                } else {
-                    message = message.replace("%team%", lastTeam.getColor().chat() + MessagesUtils.getTeamDisplayName(pls, lastTeam.getName()));
-                }
-                if (bestPlayers.size() >= 1) {
-                    message = message.replace("%first%", EndoSkullAPI.getPrefix(bestPlayers.get(0).getUuid()) + bestPlayers.get(0).getName() + " §8- §7" + bestPlayers.get(0).getKill());
-                } else {
-                    message = message.replace("%first%", MessagesUtils.ANYONE.getMessage(pls));
-                }
-                if (bestPlayers.size() >= 2) {
-                    message = message.replace("%second%", EndoSkullAPI.getPrefix(bestPlayers.get(1).getUuid()) + bestPlayers.get(1).getName() + " §8- §7" + bestPlayers.get(1).getKill());
-                } else {
-                    message = message.replace("%second%", MessagesUtils.ANYONE.getMessage(pls));
-                }
-                if (bestPlayers.size() >= 3) {
-                    message = message.replace("%third%", EndoSkullAPI.getPrefix(bestPlayers.get(2).getUuid()) + bestPlayers.get(2).getName() + " §8- §7" + bestPlayers.get(2).getKill());
-                } else {
-                    message = message.replace("%third%", MessagesUtils.ANYONE.getMessage(pls));
-                }
-                pls.sendMessage(message);
-            }
+            }, 1);
         }
 
     }

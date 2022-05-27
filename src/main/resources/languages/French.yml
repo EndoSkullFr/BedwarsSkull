@@ -20,7 +20,7 @@ end-broadcast: "§7§m-----------------------------------------------------\n§r
 anyone: "Personne"
 team-eliminate: "§c§lBEDWARS §8» §cL'équipe %team% §cvient d'être éliminé"
 magic-milk-end: "§eL'effet du lait magique s'est dissipé"
-win: "Victoire de l'Equipe"
+win: "Victoire de"
 
 default-item-lore: "§7Prix: %price%\n\n§7%desc%\n\n§aCliquez pour acheter\n§bShift-clique pour ajouter aux favoris"
 less-item-lore: "§7Prix: %price%\n\n§7%desc%\n\n§cRessources insuffisantes\n§bShift-clique pour ajouter aux favoris"
@@ -342,8 +342,7 @@ board:
     - '§a§lBEDWARS'
     - '§7{date}'
     - ''
-    - '§f{win}'
-    - '§7{winner}'
+    - '§f{win} {winner}'
     - ''
     - '§emc.endoskull.fr'
 
