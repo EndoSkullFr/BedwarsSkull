@@ -105,7 +105,11 @@ public class DeathListener implements Listener {
             p.sendMessage(message);
         }
         LastHit.getLastHit().remove(victim.getUniqueId());
-        if (finalKill && game.isGoulagOpen()) {
+        if (game.getInGoulag().contains(bwVictim)) {
+            game.getInGoulag().remove(bwVictim);
+            BedwarsPlayer bwWinner = game.getInGoulag().get(0);
+            game.winGoulag(bwWinner);
+        } else if (finalKill && game.isGoulagOpen()) {
             Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
                 victim.spigot().respawn();
                 game.sendToGoulag(bwVictim);

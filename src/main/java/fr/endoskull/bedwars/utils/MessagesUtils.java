@@ -46,6 +46,8 @@ public enum MessagesUtils {
     UPGRADES_BUY,
     UPGRADES_MAX,
     GOULAG_CLOSE,
+    GOULAG_SEND,
+    GOULAG_WIN,
     GOULAG_NOW,
     END_BROADCAST,
     ANYONE,

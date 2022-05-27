@@ -30,7 +30,6 @@ public class BedwarsCommand implements CommandExecutor {
             player.sendMessage("§cVous n'êtes pas dans une partie");
             return false;
         }
-        BedwarsPlayer bedwarsPlayer = game.getBwPlayerByUUID(player.getUniqueId());
         if (args.length >= 2 && args[0].equalsIgnoreCase("break")) {
             Team team = game.getTeamByName(args[1].toUpperCase());
             if (team == null) {

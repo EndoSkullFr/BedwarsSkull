@@ -737,8 +737,12 @@ public class Arena {
     public void sendToGoulag(BedwarsPlayer bwPlayer) {
         Player player = bwPlayer.getPlayer();
         if (player == null) return;
+        for (Player p : getAllPlayers()) {
+            p.sendMessage(MessagesUtils.GOULAG_SEND.getMessage(p).replace("{PlayerColor}", bwPlayer.getTeam().getColor().chat().toString()).replace("{PlayerName}", player.getDisplayName()));
+        }
         if (goulaging) {
             // TODO: goulag already
+            waitingGoulag.add(bwPlayer);
             return;
         }
         player.setMaxHealth(20);
@@ -788,5 +792,16 @@ public class Arena {
 
     public GoulagTask getGoulagTask() {
         return goulagTask;
+    }
+
+    public void winGoulag(BedwarsPlayer bwWinner) {
+        for (Player p : getAllPlayers()) {
+            p.sendMessage(MessagesUtils.GOULAG_WIN.getMessage(p).replace("{PlayerColor}", bwWinner.getTeam().getColor().chat().toString()).replace("{PlayerName}", bwWinner.getPlayer().getDisplayName()));
+        }
+        inGoulag.remove(bwWinner);
+        bwWinner.reset();
+        goulaging = false;
+        goulagTask.cancel();
+        goulagTask = null;
     }
 }
