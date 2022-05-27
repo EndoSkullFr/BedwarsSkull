@@ -40,6 +40,12 @@ public class GameRunnable extends BukkitRunnable {
                 }
             }
             else if (game.getGameState() == GameState.playing) {
+                if (game.getGoulagTimer() > 0) {
+                    game.setGoulagTimer(game.getGoulagTimer() - 1);
+                    if (game.getGoulagTimer() == 0) {
+                        game.closeGoulag();
+                    }
+                }
                 for (Team team : game.getTeams()) {
                     if (team.getUpgrades().getMap().containsKey(Upgrades.FORGE)) {
                         int level = team.getUpgrades().getMap().get(Upgrades.FORGE);

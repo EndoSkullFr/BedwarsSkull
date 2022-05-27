@@ -368,15 +368,22 @@ public class Arena {
         world.getWorldBorder().setCenter(lobby.getLocation(world));
         world.getWorldBorder().setSize(borderSize);
         if (teams.size() < 1) {
-            goulagOpen = false;
-            for (BedwarsPlayer bwPlayer : players) {
-                Player player = bwPlayer.getPlayer();
-                if (player == null) continue;
-                player.sendMessage("");
-                player.sendMessage(MessagesUtils.GOULAG_CLOSE.getMessage(player));
-                player.sendMessage("");
-            }
+            closeGoulag();
         }
+    }
+
+    public void closeGoulag() {
+        goulagOpen = false;
+        for (BedwarsPlayer bwPlayer : players) {
+            Player player = bwPlayer.getPlayer();
+            if (player == null) continue;
+            player.sendMessage("");
+            player.sendMessage(MessagesUtils.GOULAG_CLOSE.getMessage(player));
+            player.sendMessage("");
+        }
+        /**
+         * todo check players in goulag
+         */
     }
 
     public void nextEvent() {
