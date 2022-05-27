@@ -707,6 +707,12 @@ public class Arena {
             }*/
 
             for (Player pls : getAllPlayers()) {
+                pls.setAllowFlight(true);
+                pls.setFlying(true);
+                InventoryUtils.setSpectateInv(pls, true);
+                for (PotionEffect potionEffect : pls.getActivePotionEffects()) {
+                    pls.removePotionEffect(potionEffect.getType());
+                }
                 pls.playSound(pls.getLocation(), Sound.ENDERDRAGON_WINGS, 1, 1);
                 pls.playSound(pls.getLocation(), Sound.ENDERDRAGON_GROWL, 1, 1);
                 String message = MessagesUtils.END_BROADCAST.getMessage(pls);
@@ -834,7 +840,7 @@ public class Arena {
             sendToGoulag(bedwarsPlayer);
         }
         if (isFinalGoulag()) {
-            sendToGoulag(bwWinner);
+            if (gameState == GameState.playing) sendToGoulag(bwWinner);
         } else {
             bwWinner.reset();
         }

@@ -342,7 +342,7 @@ board:
     - '§a§lBEDWARS'
     - '§7{date}'
     - ''
-    - '§7{win}'
+    - '§f{win}'
     - '§7{winner}'
     - ''
     - '§emc.endoskull.fr'
