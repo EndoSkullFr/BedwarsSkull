@@ -90,7 +90,7 @@ public class BoardRunnable extends BukkitRunnable {
         if (!game.isGoulagOpen()) {
             return "§c✘";
         }
-        return "§a" + game.getGoulagTimer();
+        return "§a" + getText(game.getGoulagTimer());
     }
 
     private String getText(int time) {
