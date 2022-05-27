@@ -49,6 +49,7 @@ public enum MessagesUtils {
     GOULAG_SEND,
     GOULAG_WIN,
     GOULAG_ALREADY,
+    GOULAG_WAITING,
     GOULAG_NOW,
     END_BROADCAST,
     ANYONE,
@@ -56,7 +57,8 @@ public enum MessagesUtils {
     TRAP_MAX,
     TRAP_ALREADY,
     TRAP_TITLE,
-    MAGIC_MILK_END;
+    MAGIC_MILK_END,
+    WIN;
 
     public static String split(String message) {
         if (message.length() < 30) return message;

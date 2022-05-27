@@ -67,4 +67,13 @@ public class BoardConfig {
         }
         return lines;
     }
+    public static String getFinishTitle() {
+        return config.getStringList("board.finish").get(0);
+    }
+
+    public static List<String> getFinishLines() {
+        List<String> lines = config.getStringList("board.finish");
+        lines.remove(0);
+        return lines;
+    }
 }

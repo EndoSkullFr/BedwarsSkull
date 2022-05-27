@@ -71,6 +71,7 @@ public class Arena {
     private boolean goulagOpen = true;
     private boolean goulaging = false;
     private GoulagTask goulagTask;
+    private Team winner = null;
 
     public Arena() {}
 
@@ -709,6 +710,7 @@ public class Arena {
                 pls.playSound(pls.getLocation(), Sound.ENDERDRAGON_WINGS, 1, 1);
                 pls.playSound(pls.getLocation(), Sound.ENDERDRAGON_GROWL, 1, 1);
                 String message = MessagesUtils.END_BROADCAST.getMessage(pls);
+                winner = lastTeam;
                 if (lastTeam == null) {
                     message = message.replace("%team%", MessagesUtils.ANYONE.getMessage(pls));
                 } else {
@@ -768,6 +770,8 @@ public class Arena {
         if (isFinalGoulag()) {
             if (bwPlayer.getTeam().getUpgrades().getMap().containsKey(Upgrades.GOULAG)) {
                 player.getInventory().addItem(new CustomItemStack(Material.WOOD_AXE).addCustomEnchantment(Enchantment.DAMAGE_ALL, bwPlayer.getTeam().getUpgrades().getMap().get(Upgrades.GOULAG)).setUnbreakable());
+            } else {
+                player.getInventory().addItem(new CustomItemStack(Material.WOOD_AXE).setUnbreakable());
             }
         } else {
             player.getInventory().addItem(new CustomItemStack(Material.WOOD_AXE).setUnbreakable());
@@ -775,6 +779,11 @@ public class Arena {
         player.getInventory().addItem(new ItemStack(Material.BOW, 1, (byte) Material.BOW.getMaxDurability()));
         player.getInventory().addItem(new ItemStack(Material.ARROW));
         if (inGoulag.isEmpty()) {
+            if (!isFinalGoulag()) {
+                player.sendMessage("");
+                player.sendMessage(MessagesUtils.GOULAG_WAITING.getMessage(player));
+                player.sendMessage("");
+            }
             player.teleport(goulagSpawn1.getLocation(world));
         } else {
             player.teleport(goulagSpawn2.getLocation(world));
@@ -833,5 +842,13 @@ public class Arena {
 
     public boolean isFinalGoulag() {
         return (gameEvent == GameEvent.gameOver && eventTimer == -1);
+    }
+
+    public Team getWinner() {
+        return winner;
+    }
+
+    public void setWinner(Team winner) {
+        this.winner = winner;
     }
 }

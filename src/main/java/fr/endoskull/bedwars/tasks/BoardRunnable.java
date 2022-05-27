@@ -78,6 +78,24 @@ public class BoardRunnable extends BukkitRunnable {
                         }
                         board.updateLines(lines);
                     }
+                    if (game.getGameState() == GameState.finish) {
+                        List<String> lines = new ArrayList<>();
+                        for (String s : BoardConfig.getFinishLines()) {
+                            lines.add(s.replace("{date}", new SimpleDateFormat("dd/MM/yy").format(new Date()))
+                                    .replace("{win}", MessagesUtils.WIN.getMessage(player))
+                                    .replace("{winner}", game.getWinner() == null ? MessagesUtils.ANYONE.getMessage(player) : game.getWinner().getColor().chat() + MessagesUtils.getTeamDisplayName(player, game.getWinner().getName())));
+                        }
+                        board.updateTitle(BoardConfig.getFinishTitle());
+                        int i = 0;
+                        for (String line : new ArrayList<>(lines)) {
+                            if (line.length() > 30) {
+                                line = line.substring(0, 30);
+                            }
+                            lines.set(i, line);
+                            i++;
+                        }
+                        board.updateLines(lines);
+                    }
                 }
             }
         }

@@ -14,11 +14,13 @@ goulag-close: "§c§lFermeture du Goulag"
 goulag-send: "§c{PlayerColor}{PlayerName} §cvient d'être envoyé au Goulag"
 goulag-win: "§c{PlayerColor}{PlayerName} §cvient de remporter son Goulag"
 goulag-already: "§cUn goulag est déjà en cours, veuillez attendre la fin de celui-ci."
+goulag-waiting: "§cVous êtes au Goulag. La combat démarrera lorqu'un autre joueur se fera éliminer"
 goulag-now: "§eEn cours"
 end-broadcast: "§7§m-----------------------------------------------------\n§r \n§7Victoire de l'équipe %team%\n§r \n§7Meilleurs joueurs:\n          §c1er: §7%first%\n          §62eme: §7%second%\n          §e3eme: §7%third%\n§r \n§7§m-----------------------------------------------------"
 anyone: "Personne"
 team-eliminate: "§c§lBEDWARS §8» §cL'équipe %team% §cvient d'être éliminé"
 magic-milk-end: "§eL'effet du lait magique s'est dissipé"
+win: "Victoire de l'Equipe"
 
 default-item-lore: "§7Prix: %price%\n\n§7%desc%\n\n§aCliquez pour acheter\n§bShift-clique pour ajouter aux favoris"
 less-item-lore: "§7Prix: %price%\n\n§7%desc%\n\n§cRessources insuffisantes\n§bShift-clique pour ajouter aux favoris"
@@ -334,6 +336,14 @@ board:
     - '§f{nextEvent} dans §a{time}'
     - ''
     - '{teams}'
+    - ''
+    - '§emc.endoskull.fr'
+  finish:
+    - '§a§lBEDWARS'
+    - '§7{date}'
+    - ''
+    - '§7{win}'
+    - '§7{winner}'
     - ''
     - '§emc.endoskull.fr'
 
