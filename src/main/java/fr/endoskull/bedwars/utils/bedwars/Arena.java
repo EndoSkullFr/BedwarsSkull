@@ -367,7 +367,7 @@ public class Arena {
 
         world.getWorldBorder().setCenter(lobby.getLocation(world));
         world.getWorldBorder().setSize(borderSize);
-        if (teams.size() < 3 || true) {
+        if (teams.size() < 1) {
             goulagOpen = false;
             for (BedwarsPlayer bwPlayer : players) {
                 Player player = bwPlayer.getPlayer();
