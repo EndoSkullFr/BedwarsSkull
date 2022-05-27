@@ -41,7 +41,7 @@ public class DeathListener implements Listener {
             return;
         }
         BedwarsPlayer bwVictim = game.getBwPlayerByUUID(victim.getUniqueId());
-        if (bwVictim.isRespawning() || bwVictim.isSpectator()) {
+        if (bwVictim.isRespawning() || bwVictim.isSpectator() || bwVictim.isWaitingGoulag()) {
             victim.spigot().respawn();
             return;
         }
@@ -113,6 +113,11 @@ public class DeathListener implements Listener {
             Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
                 victim.spigot().respawn();
                 game.sendToGoulag(bwVictim);
+                for (Player p : game.getAllPlayers()) {
+                    p.sendMessage("");
+                    p.sendMessage(MessagesUtils.GOULAG_SEND.getMessage(p).replace("{PlayerColor}", bwVictim.getTeam().getColor().chat().toString()).replace("{PlayerName}", victim.getDisplayName()));
+                    p.sendMessage("");
+                }
             }, 3L);
             return;
         }

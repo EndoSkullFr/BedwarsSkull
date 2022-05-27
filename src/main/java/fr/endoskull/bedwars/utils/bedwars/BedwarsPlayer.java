@@ -133,6 +133,14 @@ public class BedwarsPlayer {
         isSpectator = spectator;
     }
 
+    public boolean isWaitingGoulag() {
+        return game.getWaitingGoulag().contains(this);
+    }
+
+    public boolean isInGoulag() {
+        return game.getInGoulag().contains(this);
+    }
+
     public void reset() {
         Player player = getPlayer();
         if (player == null) return;
@@ -190,7 +198,7 @@ public class BedwarsPlayer {
         if (player == null) return;
         if (isSpectator || !isAlive || isRespawning) return;
         PlayerInventory inv = player.getInventory();
-        if (!hasItem(player, Material.WOOD_SWORD) && !hasItem(player, Material.GOLD_SWORD) && !hasItem(player, Material.STONE_SWORD) && !hasItem(player, Material.IRON_SWORD) && !hasItem(player, Material.DIAMOND_SWORD)) {
+        if (!isInGoulag() && !isWaitingGoulag() && !hasItem(player, Material.WOOD_SWORD) && !hasItem(player, Material.GOLD_SWORD) && !hasItem(player, Material.STONE_SWORD) && !hasItem(player, Material.IRON_SWORD) && !hasItem(player, Material.DIAMOND_SWORD)) {
             player.getInventory().addItem(new CustomItemStack(Material.WOOD_SWORD).setUnbreakable());
         } else if ((hasItem(player, Material.GOLD_SWORD) || hasItem(player, Material.STONE_SWORD) || hasItem(player, Material.IRON_SWORD) || hasItem(player, Material.DIAMOND_SWORD)) && hasItem(player, Material.WOOD_SWORD)) {
             inv.remove(Material.WOOD_SWORD);
@@ -217,7 +225,7 @@ public class BedwarsPlayer {
         ItemStack boots = player.getInventory().getBoots();
         if (boots != null) boots.removeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL);
 
-        if (team.getUpgrades().getMap().containsKey(Upgrades.PROTECTION)) {
+        if (team.getUpgrades().getMap().containsKey(Upgrades.PROTECTION) && !isInGoulag()) {
             int level = team.getUpgrades().getMap().get(Upgrades.PROTECTION);
             if (helmet != null) player.getInventory().setHelmet(new CustomItemStack(helmet).addCustomEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, level));
             if (chestplate != null) player.getInventory().setChestplate(new CustomItemStack(chestplate).addCustomEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, level));
@@ -253,6 +261,18 @@ public class BedwarsPlayer {
             player.removePotionEffect(potionEffect.getType());
         }
     }
+
+    public void addGoulagWaiting() {
+        Player player = getPlayer();
+        if (player == null) return;
+        player.teleport(game.getLobby().getLocation(game.getWorld()));
+        player.setAllowFlight(true);
+        player.setFlying(true);
+        for (PotionEffect potionEffect : player.getActivePotionEffects()) {
+            player.removePotionEffect(potionEffect.getType());
+        }
+    }
+
     public void addRespawning() {
         Player victim = getPlayer();
         if (victim == null) return;

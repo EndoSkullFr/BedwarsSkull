@@ -13,6 +13,7 @@ cant-chest: "§cVous ne pouvez pas ouvrir ce coffre car son équipe est encore e
 goulag-close: "§c§lFermeture du Goulag"
 goulag-send: "§c{PlayerColor}{PlayerName} §cvient d'être envoyé au Goulag"
 goulag-win: "§c{PlayerColor}{PlayerName} §cvient de remporter son Goulag"
+goulag-already: "§cUn goulag est déjà en cours, veuillez attendre la fin de celui-ci."
 goulag-now: "§eEn cours"
 end-broadcast: "§7§m-----------------------------------------------------\n§r \n§7Victoire de l'équipe %team%\n§r \n§7Meilleurs joueurs:\n          §c1er: §7%first%\n          §62eme: §7%second%\n          §e3eme: §7%third%\n§r \n§7§m-----------------------------------------------------"
 anyone: "Personne"

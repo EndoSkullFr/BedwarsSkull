@@ -2,11 +2,8 @@ package fr.endoskull.bedwars;
 
 import fr.endoskull.bedwars.board.FastBoard;
 import fr.endoskull.bedwars.commands.BedwarsCommand;
-import fr.endoskull.bedwars.listeners.CustomGuiListener;
-import fr.endoskull.bedwars.listeners.SpectatorListener;
-import fr.endoskull.bedwars.listeners.WaitingListener;
+import fr.endoskull.bedwars.listeners.*;
 import fr.endoskull.bedwars.listeners.playing.*;
-import fr.endoskull.bedwars.listeners.JoinListener;
 import fr.endoskull.bedwars.tasks.ArmorStandTask;
 import fr.endoskull.bedwars.tasks.BoardRunnable;
 import fr.endoskull.bedwars.tasks.GameRunnable;
@@ -46,6 +43,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new ChestPlaceListener(), this);
         pm.registerEvents(new CustomGuiListener(), this);
         pm.registerEvents(new SpectatorListener(), this);
+        pm.registerEvents(new WeatherListener(), this);
 
         getCommand("bedwars").setExecutor(new BedwarsCommand());
         super.onEnable();

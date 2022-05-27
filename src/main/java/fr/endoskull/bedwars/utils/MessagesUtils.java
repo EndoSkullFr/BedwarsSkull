@@ -48,6 +48,7 @@ public enum MessagesUtils {
     GOULAG_CLOSE,
     GOULAG_SEND,
     GOULAG_WIN,
+    GOULAG_ALREADY,
     GOULAG_NOW,
     END_BROADCAST,
     ANYONE,

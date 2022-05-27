@@ -55,9 +55,18 @@ public class GoulagTask implements Runnable {
             for (Block block : new Cuboid(game.getGoulagLoc1().getLocation(game.getWorld()), game.getGoulagLoc2().getLocation(game.getWorld()))) {
                 block.setType(Material.AIR);
             }
+            for (BedwarsPlayer bedwarsPlayer : game.getInGoulag()) {
+                game.getWaitingGoulag().remove(bedwarsPlayer);
+            }
         } else {
             if (timer == 0) {
-                //todo kill player
+                Player player1 = game.getInGoulag().get(0).getPlayer();
+                Player player2 = game.getInGoulag().get(1).getPlayer();
+                if (player1.getHealth() > player2.getHealth()) {
+                    player2.setHealth(0);
+                } else {
+                    player1.setHealth(0);
+                }
             }
             timer--;
         }

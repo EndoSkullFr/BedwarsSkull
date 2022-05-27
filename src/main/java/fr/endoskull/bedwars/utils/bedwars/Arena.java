@@ -737,12 +737,12 @@ public class Arena {
     public void sendToGoulag(BedwarsPlayer bwPlayer) {
         Player player = bwPlayer.getPlayer();
         if (player == null) return;
-        for (Player p : getAllPlayers()) {
-            p.sendMessage(MessagesUtils.GOULAG_SEND.getMessage(p).replace("{PlayerColor}", bwPlayer.getTeam().getColor().chat().toString()).replace("{PlayerName}", player.getDisplayName()));
-        }
         if (goulaging) {
             // TODO: goulag already
-            waitingGoulag.add(bwPlayer);
+            if (!waitingGoulag.contains(bwPlayer)) waitingGoulag.add(bwPlayer);
+            player.sendMessage("");
+            player.sendMessage(MessagesUtils.GOULAG_ALREADY.getMessage(player));
+            player.sendMessage("");
             return;
         }
         player.setMaxHealth(20);
@@ -761,6 +761,8 @@ public class Arena {
         player.getInventory().setArmorContents(new ItemStack[4]);
         player.getInventory().setChestplate(new CustomItemStack(Material.LEATHER_CHESTPLATE).setLeatherColor(bwPlayer.getTeam().getColor().bukkitColor()).setUnbreakable());
         player.getInventory().addItem(new CustomItemStack(Material.WOOD_AXE).setUnbreakable());
+        player.getInventory().addItem(new CustomItemStack(Material.BOW).setData((byte) Material.BOW.getMaxDurability()));
+        player.getInventory().addItem(new CustomItemStack(Material.ARROW));
         if (inGoulag.isEmpty()) {
             player.teleport(goulagSpawn1.getLocation(world));
         } else {
@@ -796,12 +798,21 @@ public class Arena {
 
     public void winGoulag(BedwarsPlayer bwWinner) {
         for (Player p : getAllPlayers()) {
+            p.sendMessage("");
             p.sendMessage(MessagesUtils.GOULAG_WIN.getMessage(p).replace("{PlayerColor}", bwWinner.getTeam().getColor().chat().toString()).replace("{PlayerName}", bwWinner.getPlayer().getDisplayName()));
+            p.sendMessage("");
         }
         inGoulag.remove(bwWinner);
         bwWinner.reset();
         goulaging = false;
         goulagTask.cancel();
         goulagTask = null;
+        for (Block block : new Cuboid(goulagLoc1.getLocation(world), goulagLoc2.getLocation(world))) {
+            block.setType(Material.STAINED_GLASS_PANE);
+            block.setData(DyeColor.RED.getWoolData());
+        }
+        for (BedwarsPlayer bedwarsPlayer : waitingGoulag) {
+            sendToGoulag(bedwarsPlayer);
+        }
     }
 }
