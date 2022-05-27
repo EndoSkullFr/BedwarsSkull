@@ -84,7 +84,7 @@ public class BoardRunnable extends BukkitRunnable {
     }
 
     private String getGoulag(Arena game, Player player) {
-        if (game.getGameEvent() == GameEvent.gameOver && game.getEventTimer() == 0) {
+        if (game.isFinalGoulag()) {
             return MessagesUtils.GOULAG_NOW.getMessage(player);
         }
         if (!game.isGoulagOpen()) {

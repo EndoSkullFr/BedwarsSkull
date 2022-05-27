@@ -292,7 +292,7 @@ public class BedwarsPlayer {
             respawnTask.runTaskTimer(Main.getInstance(), 5, 20);
         } else {
             addSpectator();
-            //game.checkTeam(team);
+            game.checkTeam(team);
         }
     }
 

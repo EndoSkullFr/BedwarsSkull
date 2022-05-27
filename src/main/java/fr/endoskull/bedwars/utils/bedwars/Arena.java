@@ -10,6 +10,7 @@ import fr.endoskull.bedwars.tasks.RespawnTask;
 import fr.endoskull.bedwars.utils.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -398,9 +399,13 @@ public class Arena {
             player.sendMessage(MessagesUtils.getEventBroadcast(player, gameEvent));
         }
         if (gameEvent.getNext().equalsIgnoreCase("none")) {
-            /**
-             * todo end the game avec des goulags !
-             */
+            goulagOpen = true;
+            eventTimer = -1;
+            for (BedwarsPlayer bwPlayer : players) {
+                Player player = bwPlayer.getPlayer();
+                if (player == null) continue;
+                player.setHealth(0);
+            }
             return;
         }
         if (gameEvent == GameEvent.diamond2) {
@@ -760,9 +765,15 @@ public class Arena {
         player.getInventory().clear();
         player.getInventory().setArmorContents(new ItemStack[4]);
         player.getInventory().setChestplate(new CustomItemStack(Material.LEATHER_CHESTPLATE).setLeatherColor(bwPlayer.getTeam().getColor().bukkitColor()).setUnbreakable());
-        player.getInventory().addItem(new CustomItemStack(Material.WOOD_AXE).setUnbreakable());
-        player.getInventory().addItem(new CustomItemStack(Material.BOW).setData((byte) Material.BOW.getMaxDurability()));
-        player.getInventory().addItem(new CustomItemStack(Material.ARROW));
+        if (isFinalGoulag()) {
+            if (bwPlayer.getTeam().getUpgrades().getMap().containsKey(Upgrades.GOULAG)) {
+                player.getInventory().addItem(new CustomItemStack(Material.WOOD_AXE).addCustomEnchantment(Enchantment.DAMAGE_ALL, bwPlayer.getTeam().getUpgrades().getMap().get(Upgrades.GOULAG)).setUnbreakable());
+            }
+        } else {
+            player.getInventory().addItem(new CustomItemStack(Material.WOOD_AXE).setUnbreakable());
+        }
+        player.getInventory().addItem(new ItemStack(Material.BOW, 1, (byte) Material.BOW.getMaxDurability()));
+        player.getInventory().addItem(new ItemStack(Material.ARROW));
         if (inGoulag.isEmpty()) {
             player.teleport(goulagSpawn1.getLocation(world));
         } else {
@@ -803,7 +814,6 @@ public class Arena {
             p.sendMessage("");
         }
         inGoulag.remove(bwWinner);
-        bwWinner.reset();
         goulaging = false;
         goulagTask.cancel();
         goulagTask = null;
@@ -814,5 +824,14 @@ public class Arena {
         for (BedwarsPlayer bedwarsPlayer : waitingGoulag) {
             sendToGoulag(bedwarsPlayer);
         }
+        if (isFinalGoulag()) {
+            sendToGoulag(bwWinner);
+        } else {
+            bwWinner.reset();
+        }
+    }
+
+    public boolean isFinalGoulag() {
+        return (gameEvent == GameEvent.gameOver && eventTimer == -1);
     }
 }

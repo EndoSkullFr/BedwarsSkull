@@ -25,10 +25,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
@@ -105,6 +102,18 @@ public class GoulagListener implements Listener {
         if (game == null) return;
         BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(player.getUniqueId());
         if (bwPlayer.isWaitingGoulag() || bwPlayer.isInGoulag()) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBow(EntityShootBowEvent e) {
+        if (!(e.getEntity() instanceof Player)) return;
+        Player player = (Player) e.getEntity();
+        Arena game = GameUtils.getGame(player);
+        if (game == null) return;
+        BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(player.getUniqueId());
+        if (bwPlayer.isWaitingGoulag()) {
             e.setCancelled(true);
         }
     }
