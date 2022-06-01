@@ -44,6 +44,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new CustomGuiListener(), this);
         pm.registerEvents(new SpectatorListener(), this);
         pm.registerEvents(new WeatherListener(), this);
+        pm.registerEvents(new GoulagListener(this), this);
 
         getCommand("bedwars").setExecutor(new BedwarsCommand());
         super.onEnable();
