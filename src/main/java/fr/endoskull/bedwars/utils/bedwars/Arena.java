@@ -321,12 +321,6 @@ public class Arena {
         }
         for (Team team : teams) {
             if (!getPlayersPerTeam(team).isEmpty()) team.setAvailable(true);
-            /**Villager villager = world.spawn(shops.get(team).getLocation(world), Villager.class);
-            villager.setCustomName("§aSHOP");
-            villager.setCustomNameVisible(true);
-            villager.setProfession(Villager.Profession.FARMER);
-            setNoAI(villager);
-            setSilent(villager);*/
             if (!shops.get(team).getLocation(world).getChunk().isLoaded()) shops.get(team).getLocation(world).getChunk().load();
             NmsUtils.spawnVillager(shops.get(team).getLocation(world), "§a§lSHOP");
             if (!upgrades.get(team).getLocation(world).getChunk().isLoaded()) upgrades.get(team).getLocation(world).getChunk().load();
