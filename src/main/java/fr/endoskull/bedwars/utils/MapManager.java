@@ -102,12 +102,10 @@ public class MapManager {
         SlimeWorld slimeWorld = null;
         try {
             slimeWorld = plugin.loadWorld(fileLoader, arena.getOldWorld(), true, prop).clone(arena.getOldWorld() + "_copy");
+            plugin.generateWorld(slimeWorld);
             arena.setWorld(Bukkit.getWorld(arena.getOldWorld() + "_copy"));
         } catch (UnknownWorldException | CorruptedWorldException | IOException | NewerFormatException | WorldInUseException e) {
             e.printStackTrace();
         }
-        plugin.generateWorld(slimeWorld);
-
-
     }
 }
