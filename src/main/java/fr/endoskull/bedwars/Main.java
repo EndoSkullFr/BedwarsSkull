@@ -51,18 +51,18 @@ public class Main extends JavaPlugin {
         /*Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "time set 0");
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "gamerule doDaylightCycle false");
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "gamerule doWeatherCycle false");*/
-        MapManager.createRessource("world");
-        MapManager.loadArena("world");
+        MapManager.createRessource("bw_fast_food");
+        MapManager.loadArena("bw_fast_food");
         saveResource("languages/French.yml", false);
 
-        for (Arena game : games) {
+        /*for (Arena game : games) {
             game.getWorld().setDifficulty(Difficulty.PEACEFUL);
             game.getWorld().setGameRuleValue("doDaylightCycle", "false");
             game.getWorld().setGameRuleValue("doWeatherCycle", "false");
             game.getWorld().setGameRuleValue("doMobSpawning", "false");
             game.getWorld().setGameRuleValue("doMobLoot", "false");
             game.getWorld().setGameRuleValue("mobGriefing", "false");
-        }
+        }*/
 
         BukkitScheduler scheduler = Bukkit.getScheduler();
         scheduler.runTaskTimer(this, new BoardRunnable(this), 20, 5);

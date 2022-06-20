@@ -9,6 +9,7 @@ generator-protection: 1
 island-radius: 17
 worldBorder: 300
 max-build-y: 90
+needColoration: true
 game-rules:
   - doDaylightCycle:false
   - announceAdvancements:false

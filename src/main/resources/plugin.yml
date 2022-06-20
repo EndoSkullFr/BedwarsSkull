@@ -5,6 +5,8 @@ description: Bedwars plugin for EndoSkull
 main: fr.endoskull.bedwars.Main
 website: endoskull.fr
 prefix: Bedwars
+depend:
+  - SlimeWorldManager
 commands:
   bedwars:
     aliases: [bw]

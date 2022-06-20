@@ -1,5 +1,14 @@
 package fr.endoskull.bedwars.utils;
 
+import com.grinderwolf.swm.api.SlimePlugin;
+import com.grinderwolf.swm.api.exceptions.CorruptedWorldException;
+import com.grinderwolf.swm.api.exceptions.NewerFormatException;
+import com.grinderwolf.swm.api.exceptions.UnknownWorldException;
+import com.grinderwolf.swm.api.exceptions.WorldInUseException;
+import com.grinderwolf.swm.api.loaders.SlimeLoader;
+import com.grinderwolf.swm.api.world.SlimeWorld;
+import com.grinderwolf.swm.api.world.properties.SlimeProperties;
+import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
 import fr.endoskull.bedwars.utils.bedwars.BedwarsLocation;
@@ -12,6 +21,7 @@ import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 public class MapManager {
@@ -26,11 +36,12 @@ public class MapManager {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(Main.getInstance().getDataFolder(), name + ".yml"));
         Arena arena = new Arena();
         arena.setName(config.getString("display-name"));
-        Bukkit.createWorld(new WorldCreator(name));
-        arena.setWorld(Bukkit.getWorld(name));
+        //Bukkit.createWorld(new WorldCreator(name));
+        arena.setOldWorld(name);
+        cloneArenaWorld(arena);
         arena.setBorderSize(config.getInt("worldBorder"));
         arena.setLobby(new BedwarsLocation(config.getString("waiting.Loc").split(",")));
-        arena.getWorld().setSpawnLocation((int) Math.round(arena.getLobby().getX()), (int) Math.round(arena.getLobby().getY()), (int) Math.round(arena.getLobby().getZ()));
+        //arena.getWorld().setSpawnLocation((int) Math.round(arena.getLobby().getX()), (int) Math.round(arena.getLobby().getY()), (int) Math.round(arena.getLobby().getZ()));
         arena.setCorner1(new BedwarsLocation(config.getString("waiting.Pos1").split(",")));
         arena.setCorner2(new BedwarsLocation(config.getString("waiting.Pos2").split(",")));
         arena.setGoulagSpawn1(new BedwarsLocation(config.getString("goulag.Spawn1").split(",")));
@@ -42,6 +53,7 @@ public class MapManager {
         arena.setHeightLimit(config.getInt("max-build-y"));
         arena.setMaxTeamSize(config.getInt("maxInTeam"));
         arena.setMin(config.getInt("minPlayers"));
+        arena.setNeedColoration(config.getBoolean("needColoration"));
         for (String s : config.getStringList("game-rules")) {
             arena.getWorld().setGameRuleValue(s.split(":")[0], s.split(":")[1]);
         }
@@ -77,5 +89,25 @@ public class MapManager {
             }
         }
         return arena;
+    }
+
+    public static void cloneArenaWorld(Arena arena) {
+        final SlimePlugin plugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
+        SlimeLoader fileLoader = plugin.getLoader("file");
+        SlimePropertyMap prop = new SlimePropertyMap();
+        prop.setString(SlimeProperties.DIFFICULTY, "peaceful");
+        prop.setBoolean(SlimeProperties.ALLOW_ANIMALS, false);
+        prop.setBoolean(SlimeProperties.ALLOW_MONSTERS, false);
+        prop.setBoolean(SlimeProperties.PVP, true);
+        SlimeWorld slimeWorld = null;
+        try {
+            slimeWorld = plugin.loadWorld(fileLoader, arena.getOldWorld(), true, prop).clone(arena.getOldWorld() + "_copy");
+            arena.setWorld(Bukkit.getWorld(arena.getOldWorld() + "_copy"));
+        } catch (UnknownWorldException | CorruptedWorldException | IOException | NewerFormatException | WorldInUseException e) {
+            e.printStackTrace();
+        }
+        plugin.generateWorld(slimeWorld);
+
+
     }
 }

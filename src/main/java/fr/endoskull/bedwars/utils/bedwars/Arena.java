@@ -20,6 +20,7 @@ import java.util.*;
 public class Arena {
 
     private String name;
+    private String oldWorld;
     private World world;
     private int borderSize;
     private BedwarsLocation lobby;
@@ -39,6 +40,7 @@ public class Arena {
     private int maxTeamSize;
     private int min;
     private int timer = 0;
+    private boolean needColoration;
 
     private final List<Team> teams = new ArrayList<>();
     private final HashMap<Team, BedwarsLocation> spawns = new HashMap<>();
@@ -859,5 +861,21 @@ public class Arena {
 
     public void setWinner(Team winner) {
         this.winner = winner;
+    }
+
+    public boolean isNeedColoration() {
+        return needColoration;
+    }
+
+    public void setNeedColoration(boolean needColoration) {
+        this.needColoration = needColoration;
+    }
+
+    public String getOldWorld() {
+        return oldWorld;
+    }
+
+    public void setOldWorld(String oldWorld) {
+        this.oldWorld = oldWorld;
     }
 }
