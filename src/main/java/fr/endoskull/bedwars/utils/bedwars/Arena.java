@@ -339,7 +339,7 @@ public class Arena {
             team.setUpgrades(new TeamUpgrade(team));
 
             String name = oldWorld;
-            if (name.length() > 10) name = name.substring(0, 10);
+            if (name.length() > 8) name = name.substring(0, 8);
             org.bukkit.scoreboard.Team sbTeam = Main.getInstance().getScoreboard().registerNewTeam(teams.indexOf(team) + name + "-" + team.getName());
             sbTeam.setPrefix(team.getColor().chat() + "§l" + team.getName().substring(0, 1).toUpperCase() + " " + team.getColor().chat());
             sbTeam.setCanSeeFriendlyInvisibles(true);
