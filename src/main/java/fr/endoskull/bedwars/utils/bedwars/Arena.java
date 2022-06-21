@@ -359,18 +359,20 @@ public class Arena {
             }
             bwPlayer.getPlayer().getEnderChest().clear();
         }
-        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
-            for (Team team : teams) {
-                for (Block block : new Cuboid(new Location(world, spawns.get(team).getX() + baseRadius, 0, spawns.get(team).getZ() + baseRadius), new Location(world, spawns.get(team).getX() - baseRadius, 255, spawns.get(team).getZ() - baseRadius))) {
-                    if (block.getType() == Material.WOOL || block.getType() == Material.STAINED_GLASS_PANE || block.getType() == Material.STAINED_GLASS || block.getType() == Material.STAINED_CLAY || block.getType() == Material.CARPET) {
-                        block.setData(team.getColor().dye().getWoolData());
-                    }
-                    if (block.getType() == Material.BANNER) {
-                        block.setData(team.getColor().dye().getDyeData());
+        if (needColoration) {
+            Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
+                for (Team team : teams) {
+                    for (Block block : new Cuboid(new Location(world, spawns.get(team).getX() + baseRadius, 0, spawns.get(team).getZ() + baseRadius), new Location(world, spawns.get(team).getX() - baseRadius, 255, spawns.get(team).getZ() - baseRadius))) {
+                        if (block.getType() == Material.WOOL || block.getType() == Material.STAINED_GLASS_PANE || block.getType() == Material.STAINED_GLASS || block.getType() == Material.STAINED_CLAY || block.getType() == Material.CARPET) {
+                            block.setData(team.getColor().dye().getWoolData());
+                        }
+                        if (block.getType() == Material.BANNER) {
+                            block.setData(team.getColor().dye().getDyeData());
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
         for (Block block : new Cuboid(corner1.getLocation(world), corner2.getLocation(world))) {
             if (block.getType() != Material.AIR) block.setType(Material.AIR);
         }
@@ -758,14 +760,15 @@ public class Arena {
                         out.writeUTF("Lobby");
                         allPlayer.sendPluginMessage(Main.getInstance(), "BungeeCord", out.toByteArray());
                     }
-                    Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
-                        for (Player allPlayer : getAllPlayers()) {
-                            if (!allPlayer.isOnline()) continue;
-                            allPlayer.kickPlayer("");
-                        }
+                    for (Player allPlayer : getAllPlayers()) {
+                        if (!allPlayer.isOnline()) continue;
+                        allPlayer.kickPlayer("");
+                    }
+                    Bukkit.getScheduler().runTaskLaterAsynchronously(Main.getInstance(), () -> {
                         final SlimePlugin plugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
                         SlimeLoader fileLoader = plugin.getLoader("file");
                         try {
+                            Bukkit.unloadWorld(slimeWorld.getName(), true);
                             fileLoader.deleteWorld(slimeWorld.getName());
                         } catch (UnknownWorldException | IOException e) {
                             e.printStackTrace();
