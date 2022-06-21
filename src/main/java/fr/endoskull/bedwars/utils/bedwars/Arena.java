@@ -379,7 +379,11 @@ public class Arena {
 
         world.getWorldBorder().setCenter(lobby.getLocation(world));
         world.getWorldBorder().setSize(borderSize);
-        if (teams.size() < 3) {
+        int teamAmount = 0;
+        for (Team team : teams) {
+            if (team.isAvailable()) teamAmount++;
+        }
+        if (teamAmount < 3) {
             closeGoulag();
         }
     }
