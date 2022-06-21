@@ -764,6 +764,13 @@ public class Arena {
                         if (!allPlayer.isOnline()) continue;
                         allPlayer.kickPlayer("");
                     }
+                    for (Team team : teams) {
+                        String name = oldWorld;
+                        if (name.length() > 8) name = name.substring(0, 8);
+                        org.bukkit.scoreboard.Team sbTeam = Main.getInstance().getScoreboard().getTeam(teams.indexOf(team) + name + "-" + team.getName());
+                        sbTeam.unregister();
+
+                    }
                     Bukkit.getScheduler().runTaskLaterAsynchronously(Main.getInstance(), () -> {
                         final SlimePlugin plugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
                         SlimeLoader fileLoader = plugin.getLoader("file");
