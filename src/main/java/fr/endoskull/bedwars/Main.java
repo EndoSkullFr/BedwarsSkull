@@ -11,7 +11,6 @@ import fr.endoskull.bedwars.utils.MapManager;
 import fr.endoskull.bedwars.utils.NmsUtils;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
 import org.bukkit.Bukkit;
-import org.bukkit.Difficulty;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -54,7 +53,7 @@ public class Main extends JavaPlugin {
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "gamerule doWeatherCycle false");*/
         MapManager.createRessource("bw_fast_food");
         MapManager.loadArena("bw_fast_food");
-        saveResource("languages/French.yml", false);
+        saveResource("languages/french.yml", false);
 
         /*for (Arena game : games) {
             game.getWorld().setDifficulty(Difficulty.PEACEFUL);

@@ -276,6 +276,11 @@ public class Arena {
     public void addPlayer(Player player) {
         player.teleport(lobby.getLocation(world));
         InventoryUtils.setWaitingInv(player);
+        for (BedwarsPlayer bedwarsPlayer : players) {
+            Player gamePlayer = bedwarsPlayer.getPlayer();
+            gamePlayer.showPlayer(player);
+            player.showPlayer(gamePlayer);
+        }
         players.add(new BedwarsPlayer(player, null, true, false, false, this));
         if (gameState == GameState.waiting && players.size() >= min) {
             gameState = GameState.starting;
@@ -353,7 +358,8 @@ public class Arena {
         }
         for (BedwarsPlayer bwPlayer : players) {
             bwPlayer.reset();
-            org.bukkit.scoreboard.Team team = Main.getInstance().getScoreboard().getTeams().stream().filter(t -> t.getName().equalsIgnoreCase(teams.indexOf(bwPlayer.getTeam()) + world.getName() + "-" + bwPlayer.getTeam().getName())).findFirst().orElse(null);
+            final String name = oldWorld.length() > 8 ? oldWorld.substring(0, 8) : oldWorld;
+            org.bukkit.scoreboard.Team team = Main.getInstance().getScoreboard().getTeams().stream().filter(t -> t.getName().equalsIgnoreCase(teams.indexOf(bwPlayer.getTeam()) + name + "-" + bwPlayer.getTeam().getName())).findFirst().orElse(null);
             if (team != null) {
                 team.addPlayer(bwPlayer.getPlayer());
             }
@@ -397,6 +403,9 @@ public class Arena {
         for (BedwarsPlayer bwPlayer : players) {
             Player player = bwPlayer.getPlayer();
             if (player == null) continue;
+            if (inGoulag.contains(bwPlayer) || waitingGoulag.contains(bwPlayer)) {
+                player.setHealth(0);
+            }
             player.sendMessage("");
             player.sendMessage(MessagesUtils.GOULAG_CLOSE.getMessage(player));
             player.sendMessage("");
@@ -883,6 +892,16 @@ public class Arena {
         for (Block block : new Cuboid(goulagLoc1.getLocation(world), goulagLoc2.getLocation(world))) {
             block.setType(Material.STAINED_GLASS_PANE);
             block.setData(DyeColor.RED.getWoolData());
+        }int teamAmount = 0;
+        for (Team team : teams) {
+            int size = 0;
+            for (BedwarsPlayer bwPLayer : getPlayersPerTeam(team)) {
+                if (bwPLayer.isAlive()) size++;
+            }
+            if (size > 0) teamAmount++;
+        }
+        if (teamAmount < 3 && !isFinalGoulag()) {
+            closeGoulag();
         }
         for (BedwarsPlayer bedwarsPlayer : waitingGoulag) {
             sendToGoulag(bedwarsPlayer);

@@ -77,7 +77,7 @@ public enum MessagesUtils {
         return newMessage;
     }
 
-    private static File file = new File(Main.getInstance().getDataFolder(), "languages/French.yml");
+    private static File file = new File(Main.getInstance().getDataFolder(), "languages/french.yml");
     private static YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
     public String getMessage(Player player) {

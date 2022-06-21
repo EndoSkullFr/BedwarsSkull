@@ -28,6 +28,10 @@ public class RespawnTask extends BukkitRunnable {
              * + particules tnt au dessus tete
              * + particules pas invisible
              */
+            for (BedwarsPlayer bedwarsPlayer : game.getPlayers()) {
+                Player player = bedwarsPlayer.getPlayer();
+                player.showPlayer(bwPlayer.getPlayer());
+            }
             bwPlayer.reset();
             cancel();
             return;

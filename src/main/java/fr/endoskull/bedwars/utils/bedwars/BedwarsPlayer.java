@@ -260,6 +260,16 @@ public class BedwarsPlayer {
         for (PotionEffect potionEffect : player.getActivePotionEffects()) {
             player.removePotionEffect(potionEffect.getType());
         }
+        for (BedwarsPlayer gamePlayer : game.getPlayers()) {
+            Player p = gamePlayer.getPlayer();
+            if (p == null) continue;
+            if (gamePlayer.isSpectator()) {
+                player.showPlayer(p);
+                p.showPlayer(player);
+            } else {
+                p.hidePlayer(player);
+            }
+        }
     }
 
     public void addGoulagWaiting() {
@@ -275,6 +285,7 @@ public class BedwarsPlayer {
 
     public void addRespawning() {
         Player victim = getPlayer();
+
         if (victim == null) return;
         victim.getInventory().clear();
         victim.getInventory().setArmorContents(new ItemStack[4]);
@@ -285,6 +296,11 @@ public class BedwarsPlayer {
         victim.setFlying(true);
         Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
             victim.spigot().respawn();
+            for (BedwarsPlayer bwPlayer : game.getPlayers()) {
+                Player player = bwPlayer.getPlayer();
+                if (player == null) continue;
+                player.hidePlayer(getPlayer());
+            }
             victim.teleport(game.getLobby().getLocation(game.getWorld()));
         }, 3L);
         if (team.isHasBed()) {

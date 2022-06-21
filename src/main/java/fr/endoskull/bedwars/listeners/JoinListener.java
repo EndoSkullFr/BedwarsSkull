@@ -5,6 +5,7 @@ import fr.endoskull.bedwars.board.FastBoard;
 import fr.endoskull.bedwars.utils.FavoritesUtils;
 import fr.endoskull.bedwars.utils.MapManager;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,6 +24,12 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
+        e.setJoinMessage(null);
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (onlinePlayer.equals(player)) continue;
+            player.hidePlayer(onlinePlayer);
+            onlinePlayer.hidePlayer(player);
+        }
         FavoritesUtils.loadFavorites(player);
         Arena game = MapManager.findAvaibleGame(1);
         FastBoard board = new FastBoard(player);
@@ -41,6 +48,7 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
         Player player = e.getPlayer();
+        e.setQuitMessage(null);
         FavoritesUtils.saveFavorites(player);
         for (FastBoard board : new ArrayList<>(main.getBoards())) {
             if (board.getPlayer().equals(player)) {

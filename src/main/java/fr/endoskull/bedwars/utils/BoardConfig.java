@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BoardConfig {
-    private static File file = new File(Main.getInstance().getDataFolder(), "languages/French.yml");
+    private static File file = new File(Main.getInstance().getDataFolder(), "languages/french.yml");
     private static YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
     public static String getWaitingTitle() {
