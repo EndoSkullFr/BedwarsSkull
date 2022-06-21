@@ -31,6 +31,7 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         instance = this;
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         PluginManager pm = Bukkit.getPluginManager();
         //pm.registerEvents(new StartListener(), this);
         pm.registerEvents(new JoinListener(this), this);
