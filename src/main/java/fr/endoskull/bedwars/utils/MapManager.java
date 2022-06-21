@@ -1,10 +1,7 @@
 package fr.endoskull.bedwars.utils;
 
 import com.grinderwolf.swm.api.SlimePlugin;
-import com.grinderwolf.swm.api.exceptions.CorruptedWorldException;
-import com.grinderwolf.swm.api.exceptions.NewerFormatException;
-import com.grinderwolf.swm.api.exceptions.UnknownWorldException;
-import com.grinderwolf.swm.api.exceptions.WorldInUseException;
+import com.grinderwolf.swm.api.exceptions.*;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import com.grinderwolf.swm.api.world.SlimeWorld;
 import com.grinderwolf.swm.api.world.properties.SlimeProperties;
@@ -101,11 +98,11 @@ public class MapManager {
         prop.setBoolean(SlimeProperties.PVP, true);
         SlimeWorld slimeWorld = null;
         try {
-            slimeWorld = plugin.loadWorld(fileLoader, arena.getOldWorld(), true, prop).clone(arena.getOldWorld() + "_copy");
+            slimeWorld = plugin.loadWorld(fileLoader, arena.getOldWorld(), true, prop).clone(arena.getOldWorld() + "_copy", fileLoader);
             plugin.generateWorld(slimeWorld);
             arena.setWorld(Bukkit.getWorld(arena.getOldWorld() + "_copy"));
             arena.setSlimeWorld(slimeWorld);
-        } catch (UnknownWorldException | CorruptedWorldException | IOException | NewerFormatException | WorldInUseException e) {
+        } catch (UnknownWorldException | CorruptedWorldException | IOException | NewerFormatException | WorldInUseException | WorldAlreadyExistsException e) {
             e.printStackTrace();
         }
     }
