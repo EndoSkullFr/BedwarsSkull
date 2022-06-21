@@ -5,6 +5,7 @@ import com.google.common.io.ByteStreams;
 import com.grinderwolf.swm.api.SlimePlugin;
 import com.grinderwolf.swm.api.exceptions.UnknownWorldException;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
+import com.grinderwolf.swm.api.world.SlimeWorld;
 import fr.endoskull.api.commons.EndoSkullAPI;
 import fr.endoskull.api.spigot.utils.CustomItemStack;
 import fr.endoskull.api.spigot.utils.Hologram;
@@ -47,6 +48,7 @@ public class Arena {
     private int min;
     private int timer = 0;
     private boolean needColoration;
+    private SlimeWorld slimeWorld;
 
     private final List<Team> teams = new ArrayList<>();
     private final HashMap<Team, BedwarsLocation> spawns = new HashMap<>();
@@ -764,7 +766,7 @@ public class Arena {
                         final SlimePlugin plugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
                         SlimeLoader fileLoader = plugin.getLoader("file");
                         try {
-                            fileLoader.deleteWorld(world.getName());
+                            fileLoader.deleteWorld(slimeWorld.getName());
                         } catch (UnknownWorldException | IOException e) {
                             e.printStackTrace();
                         }
@@ -908,5 +910,13 @@ public class Arena {
 
     public void setOldWorld(String oldWorld) {
         this.oldWorld = oldWorld;
+    }
+
+    public SlimeWorld getSlimeWorld() {
+        return slimeWorld;
+    }
+
+    public void setSlimeWorld(SlimeWorld slimeWorld) {
+        this.slimeWorld = slimeWorld;
     }
 }
