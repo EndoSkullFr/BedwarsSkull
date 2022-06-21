@@ -1,5 +1,10 @@
 package fr.endoskull.bedwars.utils.bedwars;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+import com.grinderwolf.swm.api.SlimePlugin;
+import com.grinderwolf.swm.api.exceptions.UnknownWorldException;
+import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import fr.endoskull.api.commons.EndoSkullAPI;
 import fr.endoskull.api.spigot.utils.CustomItemStack;
 import fr.endoskull.api.spigot.utils.Hologram;
@@ -15,6 +20,7 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
+import java.io.IOException;
 import java.util.*;
 
 public class Arena {
@@ -373,7 +379,7 @@ public class Arena {
 
         world.getWorldBorder().setCenter(lobby.getLocation(world));
         world.getWorldBorder().setSize(borderSize);
-        if (teams.size() < 1) {
+        if (teams.size() < 3) {
             closeGoulag();
         }
     }
@@ -739,6 +745,31 @@ public class Arena {
                     }
                     pls.sendMessage(message);
                 }
+                Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
+                    for (Player allPlayer : getAllPlayers()) {
+                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                        out.writeUTF("Connect");
+                        out.writeUTF("Lobby");
+                        allPlayer.sendPluginMessage(Main.getInstance(), "BungeeCord", out.toByteArray());
+                    }
+                    Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
+                        for (Player allPlayer : getAllPlayers()) {
+                            if (!allPlayer.isOnline()) continue;
+                            allPlayer.kickPlayer("");
+                        }
+                        final SlimePlugin plugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
+                        SlimeLoader fileLoader = plugin.getLoader("file");
+                        try {
+                            fileLoader.deleteWorld(world.getName());
+                        } catch (UnknownWorldException | IOException e) {
+                            e.printStackTrace();
+                        }
+                        //MapManager.cloneArenaWorld(this);
+                        //gameState = GameState.waiting;
+                        Main.getInstance().getGames().remove(this);
+                        MapManager.loadArena(oldWorld);
+                    }, 50);
+                }, 100);
             }, 1);
         }
 
