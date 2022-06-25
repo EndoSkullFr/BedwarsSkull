@@ -7,6 +7,7 @@ website: endoskull.fr
 prefix: Bedwars
 depend:
   - SlimeWorldManager
+  - EndoSkullCore
 commands:
   bedwars:
     aliases: [bw]

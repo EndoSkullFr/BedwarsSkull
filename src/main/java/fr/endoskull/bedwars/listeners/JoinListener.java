@@ -1,8 +1,14 @@
 package fr.endoskull.bedwars.listeners;
 
+import fr.endoskull.api.commons.lang.MessageUtils;
+import fr.endoskull.api.commons.paf.Party;
+import fr.endoskull.api.commons.paf.PartyUtils;
+import fr.endoskull.api.spigot.utils.Languages;
 import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.board.FastBoard;
 import fr.endoskull.bedwars.utils.FavoritesUtils;
+import fr.endoskull.bedwars.utils.GameState;
+import fr.endoskull.bedwars.utils.GameUtils;
 import fr.endoskull.bedwars.utils.MapManager;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
 import org.bukkit.Bukkit;
@@ -32,6 +38,22 @@ public class JoinListener implements Listener {
         }
         FavoritesUtils.loadFavorites(player);
         Arena game = MapManager.findAvaibleGame(1);
+        int partySize = 1;
+        if (PartyUtils.isInParty(player.getUniqueId())) {
+            Party party = PartyUtils.getParty(player.getUniqueId());
+            if (party.getLeader().equals(player.getUniqueId())) {
+                partySize = party.getPlayers().size();
+                game = MapManager.findAvaibleGame(partySize);
+            } else {
+                Player leader = Bukkit.getPlayer(party.getLeader());
+                if (leader != null) {
+                    Arena leaderGame = GameUtils.getGame(leader);
+                    if ((leaderGame.getGameState() == GameState.starting || leaderGame.getGameState() == GameState.waiting) && leaderGame.getPlayers().size() < leaderGame.getTeams().size() * leaderGame.getMaxTeamSize()) {
+                        game = leaderGame;
+                    }
+                }
+            }
+        }
         FastBoard board = new FastBoard(player);
         main.getBoards().add(board);
         player.setScoreboard(main.getScoreboard());
@@ -39,9 +61,7 @@ public class JoinListener implements Listener {
         if (game != null) {
             game.addPlayer(player);
         } else {
-            /**
-             * todo no game avaible ???
-             */
+            player.kickPlayer(Languages.getLang(player).getMessage(MessageUtils.Global.ANY_SERVER));
         }
     }
 
@@ -54,6 +74,14 @@ public class JoinListener implements Listener {
             if (board.getPlayer().equals(player)) {
                 main.getBoards().remove(board);
                 break;
+            }
+        }
+        Arena game = GameUtils.getGame(player);
+        if (game != null) {
+            if (game.getGameState() == GameState.waiting || game.getGameState() == GameState.starting) {
+                game.removePlayer(player);
+            } else if (game.getGameState() == GameState.playing) {
+                game.leavePlayer(player);
             }
         }
     }

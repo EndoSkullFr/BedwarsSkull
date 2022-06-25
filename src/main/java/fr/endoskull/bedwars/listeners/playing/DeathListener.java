@@ -104,6 +104,12 @@ public class DeathListener implements Listener {
             if (!team.isHasBed()) message += " §b§lFINAL KILL !";
             p.sendMessage(message);
         }
+        bwVictim.incrementDeaths();
+        if (!team.isHasBed()) {
+            if (bwKiller != null) bwKiller.incrementFinalKills();
+        } else {
+            if (bwKiller != null) bwKiller.incrementKills();
+        }
         LastHit.getLastHit().remove(victim.getUniqueId());
         if (finalKill && game.isGoulagOpen() && !bwVictim.isWaitingGoulag() && !bwVictim.isInGoulag()) {
             Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {

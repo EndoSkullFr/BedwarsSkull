@@ -38,7 +38,7 @@ public class Arena {
     private BedwarsLocation goulagLoc1;
     private BedwarsLocation goulagLoc2;
     private GameState gameState = GameState.waiting;
-    private int startTimer = 5;
+    private int startTimer = 30;
     private GameEvent gameEvent = GameEvent.diamond2;
     private int eventTimer = 0;
     private int spawnProtection;
@@ -49,6 +49,7 @@ public class Arena {
     private int timer = 0;
     private boolean needColoration;
     private SlimeWorld slimeWorld;
+    public UUID uniqueId;
 
     private final List<Team> teams = new ArrayList<>();
     private final HashMap<Team, BedwarsLocation> spawns = new HashMap<>();
@@ -282,9 +283,49 @@ public class Arena {
             player.showPlayer(gamePlayer);
         }
         players.add(new BedwarsPlayer(player, null, true, false, false, this));
+        for (Player pls : getAllPlayers()) {
+            pls.sendMessage(MessagesUtils.JOIN.getMessage(pls).replace("{player}", player.getDisplayName())
+                    .replace("{count}", String.valueOf(players.size())).replace("{max}", String.valueOf(maxTeamSize * teams.size())));
+        }
+        if (gameState == GameState.starting && startTimer > 5 && players.size() == maxTeamSize * teams.size()) {
+            startTimer = 5;
+        }
         if (gameState == GameState.waiting && players.size() >= min) {
             gameState = GameState.starting;
         }
+        ServerInfo.updateInfo(this);
+    }
+
+    public void removePlayer(Player player) {
+        if (gameState != GameState.waiting && gameState != GameState.starting) return;
+        BedwarsPlayer bwPlayer = getBwPlayerByUUID(player.getUniqueId());
+        if (bwPlayer == null) return;
+
+        players.remove(bwPlayer);
+        for (Player pls : getAllPlayers()) {
+            pls.sendMessage(MessagesUtils.LEAVE.getMessage(pls).replace("{player}", player.getDisplayName())
+                    .replace("{count}", String.valueOf(players.size())).replace("{max}", String.valueOf(maxTeamSize * teams.size())));
+        }
+        if (gameState == GameState.starting && players.size() < min) {
+            gameState = GameState.waiting;
+            startTimer = 30;
+            for (Player pls : getAllPlayers()) {
+                pls.sendMessage(MessagesUtils.START_CANCEL.getMessage(pls));
+            }
+        }
+        ServerInfo.updateInfo(this);
+    }
+
+    public void leavePlayer(Player player) {
+        if (gameState != GameState.playing) return;
+        BedwarsPlayer bwPlayer = getBwPlayerByUUID(player.getUniqueId());
+        if (bwPlayer == null) return;
+
+        players.remove(bwPlayer);
+        for (Player pls : getAllPlayers()) {
+            pls.sendMessage(MessagesUtils.LEAVE_GAME.getMessage(pls).replace("{player}", player.getDisplayName()));
+        }
+        checkTeam(bwPlayer.getTeam());
     }
 
     public List<BedwarsPlayer> getPlayersPerTeam(Team team) {
@@ -298,6 +339,7 @@ public class Arena {
     }
 
     public void start() {
+        ServerInfo.removeInfo(this);
         gameState = GameState.playing;
         eventTimer = gameEvent.getDuration();
         diamondTier = 1;
@@ -379,13 +421,17 @@ public class Arena {
                 }
             });
         }
-        for (Block block : new Cuboid(corner1.getLocation(world), corner2.getLocation(world))) {
-            if (block.getType() != Material.AIR) block.setType(Material.AIR);
-        }
-        for (Block block : new Cuboid(goulagLoc1.getLocation(world), goulagLoc2.getLocation(world))) {
-            block.setType(Material.STAINED_GLASS_PANE);
-            block.setData(DyeColor.RED.getWoolData());
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
+            for (Block block : new Cuboid(corner1.getLocation(world), corner2.getLocation(world))) {
+                if (block.getType() != Material.AIR) Bukkit.getScheduler().runTask(Main.getInstance(), () -> block.setType(Material.AIR));
+            }
+            for (Block block : new Cuboid(goulagLoc1.getLocation(world), goulagLoc2.getLocation(world))) {
+                Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
+                    block.setType(Material.STAINED_GLASS_PANE);
+                    block.setData(DyeColor.RED.getWoolData());
+                });
+            }
+        });
 
         world.getWorldBorder().setCenter(lobby.getLocation(world));
         world.getWorldBorder().setSize(borderSize);
@@ -411,9 +457,6 @@ public class Arena {
             player.sendMessage("");
             player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 1f, 1f);
         }
-        /**
-         * todo check players in goulag
-         */
     }
 
     public void nextEvent() {
@@ -676,6 +719,7 @@ public class Arena {
         for (BedwarsPlayer bedwarsPlayer : getPlayersPerTeam(team)) {
             if (bedwarsPlayer.isAlive()) i++;
         }
+        System.out.println(i);
         if (i == 0) {
             for (Player player : getAllPlayers()) {
                 player.sendMessage(MessagesUtils.TEAM_ELIMINATE.getMessage(player).replace("%team%", team.getColor().chat() + MessagesUtils.getTeamDisplayName(player, team.getName())));
@@ -808,7 +852,6 @@ public class Arena {
         Player player = bwPlayer.getPlayer();
         if (player == null) return;
         if (goulaging) {
-            // TODO: goulag already
             if (!waitingGoulag.contains(bwPlayer)) waitingGoulag.add(bwPlayer);
             player.sendMessage("");
             player.sendMessage(MessagesUtils.GOULAG_ALREADY.getMessage(player));
@@ -947,5 +990,13 @@ public class Arena {
 
     public void setSlimeWorld(SlimeWorld slimeWorld) {
         this.slimeWorld = slimeWorld;
+    }
+
+    public UUID getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(UUID uniqueId) {
+        this.uniqueId = uniqueId;
     }
 }

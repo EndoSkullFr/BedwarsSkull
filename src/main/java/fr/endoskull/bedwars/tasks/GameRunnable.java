@@ -244,7 +244,7 @@ public class GameRunnable extends BukkitRunnable {
                         Team team = bwPlayer.getTeam();
                         if (team.getUpgrades().getMap().containsKey(Upgrades.HEAL)) {
                             int level = team.getUpgrades().getMap().get(Upgrades.HEAL);
-                            if (player.getLocation().distance(game.getSpawns().get(team).getLocation(game.getWorld()) )< game.getBaseRadius()) {
+                            if (player.getLocation().distance(game.getSpawns().get(team).getLocation(game.getWorld()) )< game.getBaseRadius() || player.getLocation().distance(game.getBeds().get(team).getLocation(game.getWorld()) )< game.getBaseRadius()) {
                                 player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, level - 1));
                             } else {
                                 player.removePotionEffect(PotionEffectType.REGENERATION);

@@ -9,6 +9,7 @@ import fr.endoskull.bedwars.tasks.BoardRunnable;
 import fr.endoskull.bedwars.tasks.GameRunnable;
 import fr.endoskull.bedwars.utils.MapManager;
 import fr.endoskull.bedwars.utils.NmsUtils;
+import fr.endoskull.bedwars.utils.ServerInfo;
 import fr.endoskull.bedwars.utils.bedwars.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
@@ -17,6 +18,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +46,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new CustomGuiListener(), this);
         pm.registerEvents(new SpectatorListener(), this);
         pm.registerEvents(new WeatherListener(), this);
+        pm.registerEvents(new ClickListener(), this);
         pm.registerEvents(new GoulagListener(this), this);
 
         getCommand("bedwars").setExecutor(new BedwarsCommand());
@@ -51,8 +54,16 @@ public class Main extends JavaPlugin {
         /*Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "time set 0");
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "gamerule doDaylightCycle false");
         Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "gamerule doWeatherCycle false");*/
-        MapManager.createRessource("bw_fast_food");
-        MapManager.loadArena("bw_fast_food");
+        //MapManager.createRessource("bw_fast_food");
+        ServerInfo.clearInfo();
+        File mapFolder = new File(getDataFolder(), "maps");
+        if (!getDataFolder().exists()) getDataFolder().mkdir();
+        if (mapFolder.exists()) mapFolder.mkdir();
+        for (File file : mapFolder.listFiles()) {
+            if (file.getName().endsWith(".yml")) {
+                MapManager.loadArena(file.getName().substring(0, file.getName().length() - 4));
+            }
+        }
         saveResource("languages/french.yml", false);
 
         /*for (Arena game : games) {
@@ -73,6 +84,14 @@ public class Main extends JavaPlugin {
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         Team team = scoreboard.registerNewTeam("default");
         team.setPrefix("§7");
+    }
+
+    @Override
+    public void onDisable() {
+        for (Arena game : games) {
+            ServerInfo.removeInfo(game);
+        }
+        super.onDisable();
     }
 
     public static Main getInstance() {

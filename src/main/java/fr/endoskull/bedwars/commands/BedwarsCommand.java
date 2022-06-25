@@ -30,6 +30,16 @@ public class BedwarsCommand implements CommandExecutor {
             player.sendMessage("§cVous n'êtes pas dans une partie");
             return false;
         }
+        if (args.length >= 1 && args[0].equalsIgnoreCase("start")) {
+            if (game.getGameState() == GameState.starting && game.getStartTimer() > 5) {
+                game.setStartTimer(5);
+            }
+        }
+        if (args.length >= 1 && args[0].equalsIgnoreCase("next")) {
+            if (game.getGameState() == GameState.playing && game.getEventTimer() > 5) {
+                game.setEventTimer(1);
+            }
+        }
         if (args.length >= 2 && args[0].equalsIgnoreCase("break")) {
             Team team = game.getTeamByName(args[1].toUpperCase());
             if (team == null) {

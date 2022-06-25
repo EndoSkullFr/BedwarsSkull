@@ -58,7 +58,11 @@ public enum MessagesUtils {
     TRAP_ALREADY,
     TRAP_TITLE,
     MAGIC_MILK_END,
-    WIN;
+    WIN,
+    JOIN,
+    LEAVE,
+    LEAVE_GAME,
+    START_CANCEL;
 
     public static String split(String message) {
         if (message.length() < 30) return message;

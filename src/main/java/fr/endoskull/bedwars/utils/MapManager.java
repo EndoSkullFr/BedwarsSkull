@@ -20,20 +20,23 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class MapManager {
 
     private static HashMap<Integer, Integer> colorMap = new HashMap<>();
 
     public static void createRessource(String name) {
-        Main.getInstance().saveResource(name + ".yml", false);
+        Main.getInstance().saveResource(name, false);
     }
 
     public static void loadArena(String name) {
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(Main.getInstance().getDataFolder(), name + ".yml"));
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(Main.getInstance().getDataFolder(), "maps/" + name + ".yml"));
         Arena arena = new Arena();
+        arena.setUniqueId(UUID.randomUUID());
         arena.setName(config.getString("display-name"));
         //Bukkit.createWorld(new WorldCreator(name));
+
         arena.setOldWorld(name);
         cloneArenaWorld(arena);
         arena.setBorderSize(config.getInt("worldBorder"));
@@ -72,6 +75,7 @@ public class MapManager {
         arena.setGoulagTimer(ConfigUtils.getGoulagTimer());
 
         Main.getInstance().getGames().add(arena);
+        ServerInfo.updateInfo(arena);
     }
 
     public static Arena findAvaibleGame(int size) {
