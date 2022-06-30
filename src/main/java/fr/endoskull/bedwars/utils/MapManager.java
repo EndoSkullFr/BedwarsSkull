@@ -11,14 +11,12 @@ import fr.endoskull.bedwars.utils.bedwars.Arena;
 import fr.endoskull.bedwars.utils.bedwars.BedwarsLocation;
 import fr.endoskull.bedwars.utils.bedwars.Team;
 import fr.endoskull.bedwars.utils.bedwars.TeamColor;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.WorldCreator;
+import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -39,6 +37,7 @@ public class MapManager {
 
         arena.setOldWorld(name);
         cloneArenaWorld(arena);
+        //arena.getWorld().setGameRuleValue("naturalRegeneration", "false");
         arena.setBorderSize(config.getInt("worldBorder"));
         arena.setLobby(new BedwarsLocation(config.getString("waiting.Loc").split(",")));
         //arena.getWorld().setSpawnLocation((int) Math.round(arena.getLobby().getX()), (int) Math.round(arena.getLobby().getY()), (int) Math.round(arena.getLobby().getZ()));
@@ -80,6 +79,7 @@ public class MapManager {
 
     public static Arena findAvaibleGame(int size) {
         Arena arena = null;
+        Collections.shuffle(Main.getInstance().getGames());
         for (Arena game : Main.getInstance().getGames()) {
             if (game.getGameState() != GameState.waiting && game.getGameState() != GameState.starting) continue;
             if (game.getPlayers().size() + size > game.getMaxTeamSize() * game.getTeams().size()) continue;
@@ -96,7 +96,7 @@ public class MapManager {
         final SlimePlugin plugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
         SlimeLoader fileLoader = plugin.getLoader("file");
         SlimePropertyMap prop = new SlimePropertyMap();
-        prop.setString(SlimeProperties.DIFFICULTY, "peaceful");
+        prop.setString(SlimeProperties.DIFFICULTY, "easy");
         prop.setBoolean(SlimeProperties.ALLOW_ANIMALS, false);
         prop.setBoolean(SlimeProperties.ALLOW_MONSTERS, false);
         prop.setBoolean(SlimeProperties.PVP, true);

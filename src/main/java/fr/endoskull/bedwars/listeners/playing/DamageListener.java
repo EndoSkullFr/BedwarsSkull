@@ -21,6 +21,10 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
+
 public class DamageListener implements Listener {
 
     @EventHandler
@@ -33,6 +37,14 @@ public class DamageListener implements Listener {
         if (bwPlayer.isRespawning() || bwPlayer.isSpectator()) {
             e.setCancelled(true);
             return;
+        }
+        if (game.getInvincibility().containsKey(bwPlayer)) {
+            if (game.getInvincibility().get(bwPlayer) > System.currentTimeMillis()) {
+                e.setCancelled(true);
+                return;
+            } else {
+                game.getInvincibility().remove(bwPlayer);
+            }
         }
     }
 
@@ -128,6 +140,7 @@ public class DamageListener implements Listener {
                     }
                 }
                 if (damager != null) {
+                    a.getInvincibility().remove(bwDamager);
                     if (bwDamager == null) {
                         e.setCancelled(true);
                         return;
@@ -186,15 +199,24 @@ public class DamageListener implements Listener {
         }
     }
 
+    private HashMap<UUID, Long> cooldown = new HashMap<>();
+
     @EventHandler
     public void onFallVoid(PlayerMoveEvent e) {
-        if (e.getTo().getY() > 0) return;
         Player player = e.getPlayer();
         Arena game = GameUtils.getGame(player);
         if (game == null) return;
         if (game.getGameState() != GameState.playing) return;
+        if (e.getTo().getY() > game.getSpawns().get(game.getTeams().get(0)).getY() - 50) return;
+        for (UUID uuid : new ArrayList<>(cooldown.keySet())) {
+            long along = cooldown.get(uuid);
+            if (System.currentTimeMillis() > along) {
+                cooldown.remove(uuid);
+            }
+        }
         BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(player.getUniqueId());
         if (bwPlayer.isSpectator() || bwPlayer.isRespawning()) return;
+        if (cooldown.containsKey(player.getUniqueId())) return;
         LastHit lastHit = LastHit.getLastHit(player);
         if (lastHit == null) {
             new LastHit(player, null, DamageType.VOID, System.currentTimeMillis());
@@ -205,6 +227,7 @@ public class DamageListener implements Listener {
                 lastHit.setType(DamageType.valueOf(lastHit.getType() + "_VOID"));
             }
         }
+        cooldown.put(player.getUniqueId(), System.currentTimeMillis() + 5000);
         player.teleport(game.getLobby().getLocation(game.getWorld()));
         player.setHealth(0);
     }

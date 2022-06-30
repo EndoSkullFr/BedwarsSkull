@@ -3,11 +3,12 @@ version: 1.0
 author: BebedlaStreat
 description: Bedwars plugin for EndoSkull
 main: fr.endoskull.bedwars.Main
-website: endoskull.fr
+website: endoskull.net
 prefix: Bedwars
 depend:
   - SlimeWorldManager
   - EndoSkullCore
+  - LuckPerms
 commands:
   bedwars:
     aliases: [bw]

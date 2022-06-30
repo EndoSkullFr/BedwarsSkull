@@ -31,8 +31,9 @@ public class BedwarsCommand implements CommandExecutor {
             return false;
         }
         if (args.length >= 1 && args[0].equalsIgnoreCase("start")) {
+            if (game.getGameState() == GameState.waiting) game.setGameState(GameState.starting);
             if (game.getGameState() == GameState.starting && game.getStartTimer() > 5) {
-                game.setStartTimer(5);
+                game.setStartTimer(6);
             }
         }
         if (args.length >= 1 && args[0].equalsIgnoreCase("next")) {

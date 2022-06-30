@@ -22,10 +22,14 @@ public class RespawnTask extends BukkitRunnable {
 
     @Override
     public void run() {
+        if (bwPlayer.getPlayer() == null) {
+            cancel();
+            bwPlayer.setRespawnTask(null);
+            return;
+        }
         if (timer == 0) {
             /**
              * todo invincibility
-             * + particules tnt au dessus tete
              * + particules pas invisible
              */
             for (BedwarsPlayer bedwarsPlayer : game.getPlayers()) {

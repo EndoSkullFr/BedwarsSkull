@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockExplodeEvent;
@@ -40,12 +41,13 @@ public class ExplosiveListener implements Listener {
 
     private final HashMap<UUID, Long> fireballCooldown = new HashMap<>();
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onTntPlace(BlockPlaceEvent e) {
         Player player = e.getPlayer();
         Arena game = GameUtils.getGame(player);
         if (game == null) return;
         if (game.getGameState() != GameState.playing) return;
+        if (e.isCancelled()) return;
         Block block = e.getBlock();
         if (block.getType() == Material.TNT) {
             block.setType(Material.AIR);

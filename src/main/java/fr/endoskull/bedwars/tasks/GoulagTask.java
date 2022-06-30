@@ -76,4 +76,12 @@ public class GoulagTask implements Runnable {
     public void cancel(){
         task.cancel();
     }
+
+    public int getStartingTimer() {
+        return startingTimer;
+    }
+
+    public int getTimer() {
+        return timer;
+    }
 }

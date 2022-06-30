@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 
 public class SpectatorListener implements Listener {
@@ -55,6 +56,17 @@ public class SpectatorListener implements Listener {
         BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(player.getUniqueId());
         if (bwPlayer.isSpectator()) e.setCancelled(true);
     }
+
+    @EventHandler
+    public void onInteract(PlayerInteractEvent e) {
+        Player player = e.getPlayer();
+        Arena game = GameUtils.getGame(player);
+        if (game == null) return;
+        if (game.getGameState() != GameState.playing) return;
+        BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(player.getUniqueId());
+        if (bwPlayer.isSpectator()) e.setCancelled(true);
+    }
+
 
     @EventHandler
     public void onDamage(EntityDamageEvent e) {

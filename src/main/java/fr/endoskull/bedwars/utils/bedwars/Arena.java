@@ -38,7 +38,7 @@ public class Arena {
     private BedwarsLocation goulagLoc1;
     private BedwarsLocation goulagLoc2;
     private GameState gameState = GameState.waiting;
-    private int startTimer = 30;
+    private int startTimer = 31;
     private GameEvent gameEvent = GameEvent.diamond2;
     private int eventTimer = 0;
     private int spawnProtection;
@@ -65,7 +65,9 @@ public class Arena {
     private final List<BedwarsLocation> emeraldGenerators = new ArrayList<>();
     private final List<BedwarsLocation> diamondGenerators = new ArrayList<>();
     private final List<BedwarsPlayer> players = new ArrayList<>();
+    private final List<BedwarsPlayer> offlinePlayers = new ArrayList<>();
     private final HashMap<Team, Integer> emeraldAtBaseTimer = new HashMap<>();
+    private final HashMap<BedwarsPlayer, Long> invincibility = new HashMap<>();
 
     private int diamondTimer;
     private int emeraldTimer;
@@ -308,7 +310,7 @@ public class Arena {
         }
         if (gameState == GameState.starting && players.size() < min) {
             gameState = GameState.waiting;
-            startTimer = 30;
+            startTimer = 31;
             for (Player pls : getAllPlayers()) {
                 pls.sendMessage(MessagesUtils.START_CANCEL.getMessage(pls));
             }
@@ -321,11 +323,43 @@ public class Arena {
         BedwarsPlayer bwPlayer = getBwPlayerByUUID(player.getUniqueId());
         if (bwPlayer == null) return;
 
-        players.remove(bwPlayer);
-        for (Player pls : getAllPlayers()) {
-            pls.sendMessage(MessagesUtils.LEAVE_GAME.getMessage(pls).replace("{player}", player.getDisplayName()));
+        if (inGoulag.contains(bwPlayer)) {
+            inGoulag.remove(bwPlayer);
+            if (isGoulaging()) {
+                winGoulag(inGoulag.get(0));
+            }
         }
-        checkTeam(bwPlayer.getTeam());
+        //players.remove(bwPlayer);
+        players.remove(bwPlayer);
+        bwPlayer.saveStats();
+        offlinePlayers.add(bwPlayer);
+
+        if (bwPlayer.isAlive()) {
+            bwPlayer.addSpectator();
+            for (Player pls : getAllPlayers()) {
+                pls.sendMessage(MessagesUtils.LEAVE_GAME.getMessage(pls).replace("{player}", player.getDisplayName()));
+            }
+            checkTeam(bwPlayer.getTeam());
+            int teamAmount = 0;
+            for (Team team : teams) {
+                if (!team.isAvailable()) continue;
+                int pls = 0;
+                for (BedwarsPlayer bedwarsPlayer : getPlayersPerTeam(team)) {
+                    if (bedwarsPlayer.isAlive()) pls++;
+                }
+                if (pls > 0) {
+                    teamAmount++;
+                }
+            }
+            if (teamAmount < 3 && !isFinalGoulag()) {
+                closeGoulag();
+            }
+        }
+
+        LastHit lastHit = LastHit.getLastHit(player);
+        if (lastHit != null) {
+            lastHit.remove();
+        }
     }
 
     public List<BedwarsPlayer> getPlayersPerTeam(Team team) {
@@ -400,6 +434,7 @@ public class Arena {
         }
         for (BedwarsPlayer bwPlayer : players) {
             bwPlayer.reset();
+            bwPlayer.addGamePlayed();
             final String name = oldWorld.length() > 8 ? oldWorld.substring(0, 8) : oldWorld;
             org.bukkit.scoreboard.Team team = Main.getInstance().getScoreboard().getTeams().stream().filter(t -> t.getName().equalsIgnoreCase(teams.indexOf(bwPlayer.getTeam()) + name + "-" + bwPlayer.getTeam().getName())).findFirst().orElse(null);
             if (team != null) {
@@ -426,10 +461,12 @@ public class Arena {
                 if (block.getType() != Material.AIR) Bukkit.getScheduler().runTask(Main.getInstance(), () -> block.setType(Material.AIR));
             }
             for (Block block : new Cuboid(goulagLoc1.getLocation(world), goulagLoc2.getLocation(world))) {
-                Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
+                /*Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
                     block.setType(Material.STAINED_GLASS_PANE);
                     block.setData(DyeColor.RED.getWoolData());
-                });
+                });*/
+                block.setType(Material.STAINED_GLASS_PANE);
+                block.setData(DyeColor.RED.getWoolData());
             }
         });
 
@@ -449,13 +486,14 @@ public class Arena {
         for (BedwarsPlayer bwPlayer : players) {
             Player player = bwPlayer.getPlayer();
             if (player == null) continue;
-            if (inGoulag.contains(bwPlayer) || waitingGoulag.contains(bwPlayer)) {
-                player.setHealth(0);
-            }
             player.sendMessage("");
             player.sendMessage(MessagesUtils.GOULAG_CLOSE.getMessage(player));
             player.sendMessage("");
             player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 1f, 1f);
+            if (inGoulag.contains(bwPlayer) || waitingGoulag.contains(bwPlayer)) {
+                bwPlayer.addSpectator();
+                checkTeam(bwPlayer.getTeam());
+            }
         }
     }
 
@@ -652,7 +690,7 @@ public class Arena {
         List<Player> result = new ArrayList<>();
         for (BedwarsPlayer bwPlayer : players) {
             Player player = bwPlayer.getPlayer();
-            if (player == null || bwPlayer.isSpectator()) continue;
+            if (player == null || bwPlayer.isSpectator() || !bwPlayer.isAlive()) continue;
             result.add(player);
         }
         return result;
@@ -719,8 +757,11 @@ public class Arena {
         for (BedwarsPlayer bedwarsPlayer : getPlayersPerTeam(team)) {
             if (bedwarsPlayer.isAlive()) i++;
         }
-        System.out.println(i);
         if (i == 0) {
+            if (team.isHasBed()) {
+                beds.get(team).getLocation(world).getBlock().setType(Material.AIR);
+                team.setHasBed(false);
+            }
             for (Player player : getAllPlayers()) {
                 player.sendMessage(MessagesUtils.TEAM_ELIMINATE.getMessage(player).replace("%team%", team.getColor().chat() + MessagesUtils.getTeamDisplayName(player, team.getName())));
                 player.playSound(player.getLocation(), Sound.ORB_PICKUP, 1, 1);
@@ -754,6 +795,15 @@ public class Arena {
             for (BedwarsPlayer bedwarsPlayer : players) {
                 if (bedwarsPlayer.getTeam() == null) continue;
                 bestPlayers.add(bedwarsPlayer);
+                if (bedwarsPlayer.getTeam().equals(lastTeam)) {
+                    bedwarsPlayer.addWin();
+                }
+                if (bedwarsPlayer.getPlayer() != null) {
+                    LastHit lastHit = LastHit.getLastHit(bedwarsPlayer.getPlayer());
+                    if (lastHit != null) {
+                        lastHit.remove();
+                    }
+                }
             }
             bestPlayers.sort(new KillComparator());
             /*for (BedwarsPlayer bwP : players) {
@@ -805,16 +855,19 @@ public class Arena {
                         message = message.replace("%third%", MessagesUtils.ANYONE.getMessage(pls));
                     }
                     pls.sendMessage(message);
+                }for (BedwarsPlayer bedwarsPlayer : players) {
+                    bedwarsPlayer.saveStats();
                 }
                 Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
                     for (Player allPlayer : getAllPlayers()) {
+                        if (!allPlayer.isOnline() || Bukkit.getPlayer(allPlayer.getUniqueId()) == null || !Objects.equals(GameUtils.getGame(allPlayer), this)) continue;
                         ByteArrayDataOutput out = ByteStreams.newDataOutput();
                         out.writeUTF("Connect");
                         out.writeUTF("Lobby");
                         allPlayer.sendPluginMessage(Main.getInstance(), "BungeeCord", out.toByteArray());
                     }
                     for (Player allPlayer : getAllPlayers()) {
-                        if (!allPlayer.isOnline()) continue;
+                        if (!allPlayer.isOnline() || Bukkit.getPlayer(allPlayer.getUniqueId()) == null || !Objects.equals(GameUtils.getGame(allPlayer), this)) continue;
                         allPlayer.kickPlayer("");
                     }
                     for (Team team : teams) {
@@ -837,6 +890,7 @@ public class Arena {
                         //gameState = GameState.waiting;
                         Main.getInstance().getGames().remove(this);
                         MapManager.loadArena(oldWorld);
+                        GameUtils.clearGame(this);
                     }, 50);
                 }, 100);
             }, 1);
@@ -849,14 +903,13 @@ public class Arena {
     }
 
     public void sendToGoulag(BedwarsPlayer bwPlayer) {
+        if (!goulagOpen) return;
+        waitingGoulag.remove(bwPlayer);
         Player player = bwPlayer.getPlayer();
         if (player == null) return;
-        if (goulaging) {
-            if (!waitingGoulag.contains(bwPlayer)) waitingGoulag.add(bwPlayer);
-            player.sendMessage("");
-            player.sendMessage(MessagesUtils.GOULAG_ALREADY.getMessage(player));
-            player.sendMessage("");
-            return;
+        for (BedwarsPlayer bedwarsPlayer : players) {
+            Player pls = bedwarsPlayer.getPlayer();
+            if (pls != null) pls.showPlayer(player);
         }
         player.setMaxHealth(20);
         player.setHealth(20);
@@ -872,6 +925,18 @@ public class Arena {
         }
         player.getInventory().clear();
         player.getInventory().setArmorContents(new ItemStack[4]);
+        if (goulaging) {
+            if (!waitingGoulag.contains(bwPlayer)) waitingGoulag.add(bwPlayer);
+            player.sendMessage("");
+            player.sendMessage(MessagesUtils.GOULAG_ALREADY.getMessage(player));
+            player.sendMessage("");
+            player.teleport(goulagSpawn1.getLocation(world));
+            for (BedwarsPlayer bedwarsPlayer : players) {
+                Player pls = bedwarsPlayer.getPlayer();
+                if (pls != null) pls.hidePlayer(player);
+            }
+            return;
+        }
         player.getInventory().setChestplate(new CustomItemStack(Material.LEATHER_CHESTPLATE).setLeatherColor(bwPlayer.getTeam().getColor().bukkitColor()).setUnbreakable());
         if (isFinalGoulag()) {
             if (bwPlayer.getTeam().getUpgrades().getMap().containsKey(Upgrades.GOULAG)) {
@@ -928,6 +993,7 @@ public class Arena {
             p.sendMessage(MessagesUtils.GOULAG_WIN.getMessage(p).replace("{PlayerColor}", bwWinner.getTeam().getColor().chat().toString()).replace("{PlayerName}", bwWinner.getPlayer().getDisplayName()));
             p.sendMessage("");
         }
+        bwWinner.incrementGoulagWin();
         inGoulag.remove(bwWinner);
         goulaging = false;
         goulagTask.cancel();
@@ -946,7 +1012,7 @@ public class Arena {
         if (teamAmount < 3 && !isFinalGoulag()) {
             closeGoulag();
         }
-        for (BedwarsPlayer bedwarsPlayer : waitingGoulag) {
+        for (BedwarsPlayer bedwarsPlayer : new ArrayList<>(waitingGoulag)) {
             sendToGoulag(bedwarsPlayer);
         }
         if (isFinalGoulag()) {
@@ -998,5 +1064,13 @@ public class Arena {
 
     public void setUniqueId(UUID uniqueId) {
         this.uniqueId = uniqueId;
+    }
+
+    public HashMap<BedwarsPlayer, Long> getInvincibility() {
+        return invincibility;
+    }
+
+    public List<BedwarsPlayer> getOfflinePlayers() {
+        return offlinePlayers;
     }
 }

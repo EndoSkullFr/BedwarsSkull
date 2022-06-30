@@ -45,7 +45,7 @@ public class GoulagListener implements Listener {
         Arena game = GameUtils.getGame(player);
         if (game == null) return;
         BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(player.getUniqueId());
-        if (bwPlayer.isWaitingGoulag()) {
+        if (bwPlayer.isWaitingGoulag() || (game.getInGoulag().contains(bwPlayer) && !game.isGoulaging()) || (bwPlayer.isInGoulag() && (game.getGoulagTask() != null && game.getGoulagTask().getStartingTimer() > 0))) {
             e.setCancelled(true);
         }
     }

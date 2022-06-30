@@ -209,4 +209,12 @@ public class CustomItemStack extends ItemStack {
         head.setItemMeta((ItemMeta)headMeta);
         return new CustomItemStack(head);
     }
+
+    public static CustomItemStack getPlayerSkull(String name) {
+        ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short)3);
+        SkullMeta headMeta = (SkullMeta)head.getItemMeta();
+        headMeta.setOwner(name);
+        head.setItemMeta(headMeta);
+        return new CustomItemStack(head);
+    }
 }

@@ -94,6 +94,7 @@ public class GameListener implements Listener {
                                 e.setCancelled(true);
                                 block.setType(Material.AIR);
                                 team.setHasBed(false);
+                                bwPlayer.incrementBedBroken();
                                 for (Player p : game.getAllPlayers()) {
                                     p.playSound(p.getLocation(), Sound.ENDERDRAGON_GROWL, 1f, 1f);
                                     String message;
@@ -237,7 +238,10 @@ public class GameListener implements Listener {
         Arena game = GameUtils.getGame(player);
         if (game == null) return;
         BedwarsPlayer bwPlayer = game.getBwPlayerByUUID(player.getUniqueId());
-        if (bwPlayer.isSpectator() || bwPlayer.isRespawning()) return;
+        if (bwPlayer.isSpectator() || bwPlayer.isRespawning()) {
+            e.setCancelled(true);
+            return;
+        }
         Item item = e.getItem();
         if (game.getSplitItems().contains(item)) {
             for (Entity ent : player.getNearbyEntities(2.0D, 2.0D, 2.0D)) {
@@ -299,27 +303,22 @@ public class GameListener implements Listener {
         ItemStack current = e.getCurrentItem();
         ItemStack cursor = e.getCursor();
         if (e.getClickedInventory() == null || e.getClickedInventory().getType() == null) return;
-        if ((e.getClickedInventory().getType() == InventoryType.CHEST || e.getClickedInventory().getType() == InventoryType.ENDER_CHEST) && cursor != null && cursor.getType() == Material.WOOD_SWORD) {
+        if ((e.getClickedInventory().getType() == InventoryType.CHEST || e.getClickedInventory().getType() == InventoryType.ENDER_CHEST) && cursor != null && (cursor.getType() == Material.WOOD_SWORD || cursor.getType() == Material.SHEARS || cursor.getType().toString().endsWith("AXE"))) {
             e.setCancelled(true);
         }
         Inventory openInv = player.getOpenInventory().getTopInventory();
         if (openInv != null) {
-            if (e.getClickedInventory().getType() == InventoryType.PLAYER && (openInv.getType() == InventoryType.CHEST || openInv.getType() == InventoryType.ENDER_CHEST) && e.getClick().isShiftClick() && current != null && current.getType() == Material.WOOD_SWORD) {
+            if (e.getClickedInventory().getType() == InventoryType.PLAYER && (openInv.getType() == InventoryType.CHEST || openInv.getType() == InventoryType.ENDER_CHEST) && e.getClick().isShiftClick() && current != null && (current.getType() == Material.WOOD_SWORD || current.getType() == Material.SHEARS || current.getType().toString().endsWith("AXE"))) {
                 e.setCancelled(true);
             }
         }
-        if (e.getClick() == ClickType.NUMBER_KEY) {
+        if (e.getClick() == ClickType.NUMBER_KEY && (e.getClickedInventory().getType() == InventoryType.CHEST || e.getClickedInventory().getType() == InventoryType.ENDER_CHEST)) {
             int slot = e.getHotbarButton();
             ItemStack it = player.getInventory().getItem(slot);
-            if (it != null && it.getType() == Material.WOOD_SWORD) {
+            if (it != null && (it.getType() == Material.WOOD_SWORD || it.getType() == Material.SHEARS || it.getType().toString().endsWith("AXE"))) {
                 e.setCancelled(true);
             }
         }
-    }
-
-    @EventHandler
-    public void onSwap(InventoryMoveItemEvent e) {
-        System.out.println("InventoryMoveItemEvent");
     }
 
 }

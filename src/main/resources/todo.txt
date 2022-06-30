@@ -1,0 +1,18 @@
+#- regen custom
+#- pioche et hache dans les coffres
+#- afficher kills dans le tab
+#- statistiques
+#- messages début de game
+
+- patch item !finish
+- leave = pas éliminé team si déjà éliminé
+#- trap blindess: tout le monde l'a
+#- trap en 2 temps:
+#    - message à l'équipe
+#    - appliquation des effets
+- bloqué les achats quand inv full
+#- enlever bed lors de la déconnection
+#- check goulag deco et tout court en fait
+#- patch vie golem
+#- stat goulag win
+#- patch lasthit (remove end & +30s)

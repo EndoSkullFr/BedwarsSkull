@@ -37,12 +37,13 @@ public class Despawnable {
     private Team team;
     private Arena arena;
     private int despawn = 250;
-    private String name;
+    private final String name;
     private UUID uuid;
     private Player player;
 
     public Despawnable(LivingEntity e, Team team, Arena arena, int despawn, String name, Player player) {
         this.e = e;
+        this.name = name;
         if (e == null) return;
         this.uuid = e.getUniqueId();
         this.team = team;
@@ -51,7 +52,6 @@ public class Despawnable {
         if (despawn != 0) {
             this.despawn = despawn;
         }
-        this.name = name;
         despawnableMap.put(uuid, this);
         this.setName();
     }
@@ -78,11 +78,14 @@ public class Despawnable {
 
     public void setName() {
         int percentuale = (int) ((e.getHealth() * 100) / e.getMaxHealth() / 10);
-        String name = this.name.replace("{despawn}", String.valueOf(despawn)).replace("{health}",
-                new String(new char[percentuale]).replace("\0", "▮ " + new String(new char[10 - percentuale]).replace("\0", "§7" + "▮ ")));
+        String health1 = new String(new char[percentuale]).replace("\0", "▮ ");
+        String health2 = new String(new char[10 - percentuale]).replace("\0", "§7" + "▮ ");
+        String health = health1 + health2;
+        String name = this.name.replace("{despawn}", String.valueOf(despawn)).replace("{health}", health);
         if (team != null) {
             name = name.replace("{TeamColor}", team.getColor().chat().toString()).replace("{TeamName}", team.getName());
         }
+        System.out.println(this.name);
         e.setCustomName(name);
     }
 

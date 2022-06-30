@@ -5,7 +5,7 @@ generators:
   emerald-at-base: 60
   iron:
     delay: 2
-    amount: 1
+    amount: 2
     spawn-limit: 40
   gold:
     delay: 8

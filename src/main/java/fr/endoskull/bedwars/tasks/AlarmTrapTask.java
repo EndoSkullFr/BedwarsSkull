@@ -5,23 +5,24 @@ import fr.endoskull.bedwars.utils.bedwars.Arena;
 import fr.endoskull.bedwars.utils.bedwars.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
-public class AlarmTrapTask extends BukkitRunnable {
+public class AlarmTrapTask implements Runnable {
     private int i = 0;
     private boolean b = false;
     private Team team;
     private Arena game;
+    private BukkitTask task;
 
     public AlarmTrapTask(Team team, Arena game) {
         this.team = team;
         this.game = game;
-        Bukkit.getScheduler().runTaskTimer(Main.getInstance(), this, 10, 10);
+        task = Bukkit.getScheduler().runTaskTimer(Main.getInstance(), this, 5, 5);
     }
 
     @Override
     public void run() {
-        if (i > 20) {
+        if (i > 40) {
             cancel();
             return;
         }
@@ -33,6 +34,10 @@ public class AlarmTrapTask extends BukkitRunnable {
         }
         b = !b;
         i++;
-        game.getWorld().playSound(game.getSpawns().get(team).getLocation(game.getWorld()), sound, 1, 1);
+        game.getWorld().playSound(game.getBeds().get(team).getLocation(game.getWorld()), sound, 10, 1);
+    }
+
+    public void cancel(){
+        task.cancel();
     }
 }

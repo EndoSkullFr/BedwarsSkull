@@ -1,5 +1,7 @@
 package fr.endoskull.bedwars.utils.bedwars;
 
+import fr.endoskull.api.commons.account.Account;
+import fr.endoskull.api.commons.account.AccountProvider;
 import fr.endoskull.bedwars.Main;
 import fr.endoskull.bedwars.tasks.RespawnTask;
 import fr.endoskull.bedwars.utils.*;
@@ -32,6 +34,8 @@ public class BedwarsPlayer {
     private int kill = 0;
     private int death = 0;
     private int finalKill = 0;
+    private int bedBroken = 0;
+    private int goulagWin = 0;
 
     private int magicMilk = 0;
 
@@ -39,7 +43,7 @@ public class BedwarsPlayer {
 
     public BedwarsPlayer(Player player, Team team, boolean isAlive, boolean isRespawning, boolean isSpectator, Arena game) {
         this.uuid = player.getUniqueId();
-        this.name = player.getName();
+        this.name = player.getDisplayName();
         this.team = team;
         this.isAlive = isAlive;
         this.isRespawning = isRespawning;
@@ -81,8 +85,15 @@ public class BedwarsPlayer {
         return finalKill;
     }
 
+    public int getGoulagWin() {
+        return goulagWin;
+    }
+
     public void incrementKills() {
         kill++;
+    }
+    public void incrementBedBroken() {
+        bedBroken++;
     }
 
     public void incrementDeaths() {
@@ -91,6 +102,10 @@ public class BedwarsPlayer {
 
     public void incrementFinalKills() {
         finalKill++;
+    }
+
+    public void incrementGoulagWin() {
+        goulagWin++;
     }
 
     public RespawnTask getRespawnTask() {
@@ -164,6 +179,7 @@ public class BedwarsPlayer {
         player.setAllowFlight(false);
         player.setFallDistance(0);
         player.getInventory().setHeldItemSlot(0);
+        game.getInvincibility().put(this, System.currentTimeMillis() + 3000);
         for (PotionEffect potionEffect : player.getActivePotionEffects()) {
             player.removePotionEffect(potionEffect.getType());
         }
@@ -296,6 +312,7 @@ public class BedwarsPlayer {
         victim.setFlying(true);
         Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
             victim.spigot().respawn();
+            if (getPlayer() == null) return;
             for (BedwarsPlayer bwPlayer : game.getPlayers()) {
                 Player player = bwPlayer.getPlayer();
                 if (player == null) continue;
@@ -318,5 +335,33 @@ public class BedwarsPlayer {
 
     public void setMagicMilk(int magicMilk) {
         this.magicMilk = magicMilk;
+    }
+
+    public int getBedBroken() {
+        return bedBroken;
+    }
+
+    public void saveStats() {
+        Account account = AccountProvider.getAccount(uuid);
+        account.incrementStatistic("bedwars/kill", kill);
+        kill = 0;
+        account.incrementStatistic("bedwars/finalkill", finalKill);
+        finalKill = 0;
+        account.incrementStatistic("bedwars/death", death);
+        death = 0;
+        account.incrementStatistic("bedwars/bedbroken", bedBroken);
+        bedBroken = 0;
+        account.incrementStatistic("bedwars/goulagwin", goulagWin);
+        goulagWin = 0;
+    }
+
+    public void addGamePlayed() {
+        Account account = AccountProvider.getAccount(uuid);
+        account.incrementStatistic("bedwars/gameplayed", 1);
+    }
+
+    public void addWin() {
+        Account account = AccountProvider.getAccount(uuid);
+        account.incrementStatistic("bedwars/win", 1);
     }
 }

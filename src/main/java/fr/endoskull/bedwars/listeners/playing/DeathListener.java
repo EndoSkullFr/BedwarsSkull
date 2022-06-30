@@ -105,10 +105,9 @@ public class DeathListener implements Listener {
             p.sendMessage(message);
         }
         bwVictim.incrementDeaths();
+        if (bwKiller != null) bwKiller.incrementKills();
         if (!team.isHasBed()) {
             if (bwKiller != null) bwKiller.incrementFinalKills();
-        } else {
-            if (bwKiller != null) bwKiller.incrementKills();
         }
         LastHit.getLastHit().remove(victim.getUniqueId());
         if (finalKill && game.isGoulagOpen() && !bwVictim.isWaitingGoulag() && !bwVictim.isInGoulag()) {

@@ -62,7 +62,10 @@ public enum MessagesUtils {
     JOIN,
     LEAVE,
     LEAVE_GAME,
-    START_CANCEL;
+    START_CANCEL,
+    SPECTATOR,
+    STARTING,
+    INV_FULL;
 
     public static String split(String message) {
         if (message.length() < 30) return message;
@@ -144,6 +147,6 @@ public enum MessagesUtils {
     }
 
     public static String getTeamDisplayName(Player player, String team) {
-        return config.getString("team." + team);
+        return config.getString("team." + team.toLowerCase());
     }
 }

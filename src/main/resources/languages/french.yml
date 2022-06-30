@@ -3,6 +3,7 @@ upgrades-text: "Améliorations"
 cost: "Prix"
 join: "§c§lBEDWARS §8» §a{player} §7vient de rejoindre la partie (§a{count}§7/§a{max}§7)"
 leave: "§c§lBEDWARS §8» §c{player} §7vient de quitter la partie (§c{count}§7/§c{max}§7)"
+starting: "§c§lBEDWARS §8» §7Début de la partie dans §c{time} §7seconde{s}"
 start-cancel: "§c§lBEDWARS §8» §cDébut de la partie annulé"
 leave-game: "§c§lBEDWARS §8» §c{player} §7est parti"
 bought-item: "§c§lBEDWARS §8» §aVous avez acheté §6%item% x%amount%"
@@ -25,6 +26,7 @@ anyone: "Personne"
 team-eliminate: "§c§lBEDWARS §8» §cL'équipe %team% §cvient d'être éliminé"
 magic-milk-end: "§eL'effet du lait magique s'est dissipé"
 win: "Victoire de"
+inv-full: "§c§lBEDWARS §8» §cVotre inventaire est plein"
 
 default-item-lore: "§7Prix: %price%\n\n§7%desc%\n\n§aCliquez pour acheter\n§bShift-clique pour ajouter aux favoris"
 less-item-lore: "§7Prix: %price%\n\n§7%desc%\n\n§cRessources insuffisantes\n§bShift-clique pour ajouter aux favoris"
@@ -307,7 +309,7 @@ events:
     broadcast: "§c§lBEDWARS §8» §cLe goulag final va commencer"
 board:
   waiting:
-    - '§a§lBED WARS'
+    - '§a§lBEDWARS'
     - '§7{date} §8{server}'
     - ''
     - '§fMap: §a{map}'
@@ -318,9 +320,9 @@ board:
     - ''
     - '§fMode: §aGoulag'
     - ''
-    - '§emc.endoskull.fr'
+    - '§emc.endoskull.net'
   starting:
-    - '§a§lBED WARS'
+    - '§a§lBEDWARS'
     - '§7{date} §8{server}'
     - ''
     - '§fMap: §a{map}'
@@ -331,7 +333,7 @@ board:
     - ''
     - '§fMode: §aGoulag'
     - ''
-    - '§emc.endoskull.fr'
+    - '§emc.endoskull.net'
   playing:
     - '§a§lBEDWARS'
     - '§7{date}'
@@ -341,15 +343,16 @@ board:
     - ''
     - '{teams}'
     - ''
-    - '§emc.endoskull.fr'
+    - '§emc.endoskull.net'
   finish:
     - '§a§lBEDWARS'
     - '§7{date}'
     - ''
     - '§f{win} {winner}'
     - ''
-    - '§emc.endoskull.fr'
+    - '§emc.endoskull.net'
 
+spectator: "Spectateur"
 team:
   red: Rouge
   blue: Bleu
