@@ -286,6 +286,18 @@ public class BedwarsPlayer {
                 p.hidePlayer(player);
             }
         }
+        Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
+            for (BedwarsPlayer gamePlayer : game.getPlayers()) {
+                Player p = gamePlayer.getPlayer();
+                if (p == null) continue;
+                if (gamePlayer.isSpectator()) {
+                    player.showPlayer(p);
+                    p.showPlayer(player);
+                } else {
+                    p.hidePlayer(player);
+                }
+            }
+        }, 5L);
     }
 
     public void addGoulagWaiting() {

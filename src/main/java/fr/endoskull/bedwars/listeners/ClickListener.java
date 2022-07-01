@@ -36,7 +36,7 @@ public class ClickListener implements Listener {
                 player.kickPlayer("§cRetour au lobby");
             }
         }
-        if (game.getGameState() == GameState.finish || !bwPlayer.isAlive()) {
+        if (game.getGameState() == GameState.finish || !bwPlayer.isAlive() || bwPlayer.isSpectator()) {
             if (item.getType() == Material.PAPER) {
                 /*
                 envoyer au lobby
@@ -52,9 +52,7 @@ public class ClickListener implements Listener {
                 player.sendPluginMessage(Main.getInstance(), "BungeeCord", out.toByteArray());
             }
             if (item.getType() == Material.COMPASS) {
-                if (game.getGameState() == GameState.finish) {
-                    new SpectatorGui(game, player).open(player);
-                }
+                new SpectatorGui(game, player).open(player);
             }
         }
     }

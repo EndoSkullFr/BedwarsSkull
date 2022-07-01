@@ -16,3 +16,5 @@
 #- patch vie golem
 #- stat goulag win
 #- patch lasthit (remove end & +30s)
+
+ordre de tri tab
